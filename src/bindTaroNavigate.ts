@@ -10,7 +10,7 @@ export interface wxNavigateToOption {
 
 export default class bindTaroNavigate {
   static bind(Taro: Taro) {
-    Taro.navigateTo = this.wxNavigateTo.bind(this)
+    Taro.navigateTo = this.wxNavigateTo.bind(this);
     // Taro.redirectTo = this.wxRedirectTo.bind(this)
     // Taro.navigateBack = this.wxNavigateBack.bind(this)
     // Taro.switchTab = this.wxSwitchTab.bind(this)
@@ -26,17 +26,14 @@ export default class bindTaroNavigate {
   }
 
   static wxNavigateTo(option: wxNavigateToOption) {
-    let { url, success, fail, complete } = option
+    let { url, success, fail, complete } = option;
     if (url.startsWith('/')) {
-      url = url.substr(1)
+      url = url.substr(1);
     }
     let obj = QueryString.parseUrl(url);
     console.log('wxNavigateTo obj', obj);
     try {
       NavigationService.push(obj.url, obj.query);
-    } catch (error) {
-
-    }
+    } catch (error) {}
   }
-  
 }

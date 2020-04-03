@@ -10,14 +10,12 @@ export interface HomeIconWithBadgeProps {
   selectedColor: string;
 }
 
-interface IState {
-
-}
+interface IState {}
 
 export default class HomeIconWithBadge extends React.Component<HomeIconWithBadgeProps, IState> {
   static defaultProps = {
-    text: ''
-  }
+    text: '',
+  };
   render() {
     const { focused, selectedIcon, icon, text, color, selectedColor } = this.props;
     return (
@@ -25,7 +23,7 @@ export default class HomeIconWithBadge extends React.Component<HomeIconWithBadge
         <Image style={styles.img} source={focused ? selectedIcon : icon} />
         <Text style={[styles.text, { color: focused ? selectedColor : color }]}>{text}</Text>
       </View>
-    )
+    );
   }
 }
 
@@ -33,7 +31,7 @@ const styles = StyleSheet.create({
   container: {
     width: 30,
     height: 30,
-    display: "flex",
+    display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
@@ -44,5 +42,5 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 12,
-  }
-})
+  },
+});

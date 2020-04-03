@@ -31,8 +31,7 @@ class bindTaroNavigate {
         try {
             NavigationService_1.default.push(obj.url, obj.query);
         }
-        catch (error) {
-        }
+        catch (error) { }
     }
 }
 exports.default = bindTaroNavigate;

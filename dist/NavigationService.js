@@ -12,10 +12,11 @@ const getNavigator = () => _navigator;
  * @param params
  */
 const navigate = (routeName, params) => {
-    _navigator && _navigator.dispatch(react_navigation_1.NavigationActions.navigate({
-        routeName,
-        params,
-    }));
+    _navigator &&
+        _navigator.dispatch(react_navigation_1.NavigationActions.navigate({
+            routeName,
+            params,
+        }));
 };
 /**
  * 无论如何都会向栈增加页面
@@ -25,12 +26,13 @@ const navigate = (routeName, params) => {
  * @param key
  */
 const push = (routeName, params, action, key) => {
-    _navigator && _navigator.dispatch(react_navigation_1.StackActions.push({
-        routeName,
-        params,
-        action,
-        key,
-    }));
+    _navigator &&
+        _navigator.dispatch(react_navigation_1.StackActions.push({
+            routeName,
+            params,
+            action,
+            key,
+        }));
 };
 const goBack = (pageKey) => {
     _navigator && _navigator.dispatch(react_navigation_1.NavigationActions.back({ key: pageKey }));

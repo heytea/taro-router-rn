@@ -14,14 +14,14 @@ class HomeIconWithBadge extends react_1.default.Component {
     }
 }
 HomeIconWithBadge.defaultProps = {
-    text: ''
+    text: '',
 };
 exports.default = HomeIconWithBadge;
 const styles = react_native_1.StyleSheet.create({
     container: {
         width: 30,
         height: 30,
-        display: "flex",
+        display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
@@ -32,5 +32,5 @@ const styles = react_native_1.StyleSheet.create({
     },
     text: {
         fontSize: 12,
-    }
+    },
 });
