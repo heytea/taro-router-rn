@@ -7,7 +7,7 @@
 
     ```json
     "dependencies": {
-        "@heytea/taro-router-rn": "git+https://git.heytea.com/react-native-plugs/taro-router-rn.git"
+        "@heytea/taro-router-rn": "git+https://github.com/heytea/taro-router-rn.git"
     }
     ```
 3. add compile setting to your config/index.js file
