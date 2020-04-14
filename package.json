@@ -9,7 +9,7 @@
     "index.js"
   ],
   "scripts": {
-    "build": "yarn && rm -rf dist && mkdir dist && gulp && rm -rf node_modules/",
+    "build": "yarn && rm -rf dist && mkdir dist && gulp",
     "dev": "npm run build:static && tsc --watch",
     "prepack": "npm run build",
     "test": "jest"
