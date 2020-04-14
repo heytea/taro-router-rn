@@ -156,6 +156,8 @@ const initRouter = (pageList: PageList, Taro: Taro, appConfig: any) => {
       theme="light"
       ref={navigatorRef => {
         NavigationService.setTopLevelNavigator(navigatorRef);
+        // 绑定Taro的路由跳转方法
+        TaroProvider.bind(Taro);
       }}
       onNavigationStateChange={(prevState, currentState, action) => {
         const currentRouteName = getActiveRouteName(currentState);
@@ -166,8 +168,6 @@ const initRouter = (pageList: PageList, Taro: Taro, appConfig: any) => {
       }}
     />
   );
-  // 绑定Taro的路由跳转方法
-  TaroProvider.bind(Taro);
   return () => element;
 };
 

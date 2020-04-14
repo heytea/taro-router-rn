@@ -131,6 +131,8 @@ const initRouter = (pageList, Taro, appConfig) => {
     const AppContainer = createRouter(pageList, appConfig);
     const element = (react_1.default.createElement(AppContainer, { theme: "light", ref: navigatorRef => {
             NavigationService_1.default.setTopLevelNavigator(navigatorRef);
+            // 绑定Taro的路由跳转方法
+            TaroProvider_1.default.bind(Taro);
         }, onNavigationStateChange: (prevState, currentState, action) => {
             const currentRouteName = getActiveRouteName(currentState);
             const previousRouteName = getActiveRouteName(prevState);
@@ -138,8 +140,6 @@ const initRouter = (pageList, Taro, appConfig) => {
             NavigationService_1.default.setPreviousRouteName(previousRouteName);
             NavigationService_1.default.setRoutes(currentState.routes);
         } }));
-    // 绑定Taro的路由跳转方法
-    TaroProvider_1.default.bind(Taro);
     return () => element;
 };
 exports.initRouter = initRouter;
