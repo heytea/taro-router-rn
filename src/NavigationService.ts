@@ -2,32 +2,52 @@ import {
   NavigationActions,
   StackActions,
   NavigationContainerComponent,
-  NavigationParams,
   NavigationPopToTopActionPayload,
-  NavigationNavigateAction,
+  NavigationReplaceActionPayload,
+  NavigationResetActionPayload,
+  NavigationBackActionPayload,
+  NavigationPushActionPayload,
+  NavigationNavigateActionPayload,
+  NavigationPopActionPayload,
+  NavigationRoute,
 } from 'react-navigation';
 
 let _navigator: NavigationContainerComponent | null;
+let _currentRouteName: string | null;
+let _previousRouteName: string | null;
+let _routes: NavigationRoute[] = [];
 
 const setTopLevelNavigator = (navigatorRef: NavigationContainerComponent | null) => {
   _navigator = navigatorRef;
 };
 
+const setCurrentRouteName = (name: string | null) => {
+  _currentRouteName = name;
+};
+
+const setPreviousRouteName = (name: string | null) => {
+  _previousRouteName = name;
+};
+
+const setRoutes = (routes: NavigationRoute[]) => {
+  _routes = routes;
+};
+
 const getNavigator = () => _navigator;
+
+const getCurrentRouteName = () => _currentRouteName;
+
+const getPreviousRouteName = () => _previousRouteName;
+
+const getRoutes = () => _routes;
 
 /**
  * 会复用栈内已存在的页面
  * @param routeName
  * @param params
  */
-const navigate = (routeName: string, params?: NavigationParams | undefined) => {
-  _navigator &&
-    _navigator.dispatch(
-      NavigationActions.navigate({
-        routeName,
-        params,
-      }),
-    );
+const navigate = (options: NavigationNavigateActionPayload) => {
+  _navigator && _navigator.dispatch(NavigationActions.navigate(options));
 };
 
 /**
@@ -37,41 +57,38 @@ const navigate = (routeName: string, params?: NavigationParams | undefined) => {
  * @param action
  * @param key
  */
-const push = (routeName: string, params?: NavigationParams, action?: NavigationNavigateAction, key?: string) => {
-  _navigator &&
-    _navigator.dispatch(
-      StackActions.push({
-        routeName,
-        params,
-        action,
-        key,
-      }),
-    );
+const push = (options: NavigationPushActionPayload) => {
+  _navigator && _navigator.dispatch(StackActions.push(options));
 };
 
-const goBack = (pageKey?: string | null | undefined) => {
-  _navigator && _navigator.dispatch(NavigationActions.back({ key: pageKey }));
+const goBack = (options?: NavigationBackActionPayload) => {
+  _navigator && _navigator.dispatch(NavigationActions.back(options));
 };
 
-const reset = (index: number, routeName: string, key?: string | null | undefined) => {
-  const resetAction = StackActions.reset({
-    index,
-    actions: [NavigationActions.navigate({ routeName })],
-    key,
-  });
-  _navigator && _navigator.dispatch(resetAction);
+const reset = (options: NavigationResetActionPayload) => {
+  _navigator && _navigator.dispatch(StackActions.reset(options));
 };
 
-const replace = (routeName: string) => {
-  _navigator && _navigator.dispatch(StackActions.replace({ routeName }));
+const replace = (options: NavigationReplaceActionPayload) => {
+  _navigator && _navigator.dispatch(StackActions.replace(options));
 };
 
 const popToTop = (options?: NavigationPopToTopActionPayload) => {
   _navigator && _navigator.dispatch(StackActions.popToTop(options));
 };
 
+const pop = (options: NavigationPopActionPayload) => {
+  _navigator && _navigator.dispatch(StackActions.pop(options));
+};
+
 const NavigationService = {
   setTopLevelNavigator,
+  setCurrentRouteName,
+  getCurrentRouteName,
+  setPreviousRouteName,
+  getPreviousRouteName,
+  setRoutes,
+  getRoutes,
   getNavigator,
   navigate,
   push,
@@ -79,6 +96,7 @@ const NavigationService = {
   reset,
   replace,
   popToTop,
+  pop,
 };
 
 export default NavigationService;

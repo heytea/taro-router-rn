@@ -9,7 +9,7 @@ const react_navigation_1 = require("react-navigation");
 const react_navigation_stack_1 = require("react-navigation-stack");
 const react_navigation_tabs_1 = require("react-navigation-tabs");
 const NavigationService_1 = __importDefault(require("./NavigationService"));
-const bindTaroNavigate_1 = __importDefault(require("./bindTaroNavigate"));
+const TaroProvider_1 = __importDefault(require("./TaroProvider"));
 const HEADER_CONFIG_MAP = {
     navigationBarTitleText: 'title',
     navigationBarTextStyle: 'headerTintColor',
@@ -25,7 +25,7 @@ function getNavigationOption(config) {
     if (typeof config !== 'object') {
         return navigationOption;
     }
-    Object.keys(config).forEach((key) => {
+    Object.keys(config).forEach(key => {
         if (HEADER_CONFIG_MAP[key]) {
             navigationOption[HEADER_CONFIG_MAP[key]] = config[key];
         }
@@ -37,24 +37,23 @@ exports.getNavigationOption = getNavigationOption;
 function getTabBarRouterConfig(pageList, tabBar, navigationOptions) {
     const routerConfig = {};
     const tabBarRouterNames = tabBar.list.reduce((acc, cur) => acc + ' ' + cur.pagePath, '');
-    tabBar.list.forEach((item) => {
+    tabBar.list.forEach(item => {
         const currentTabPagePath = item.pagePath;
-        const currentTabBar = pageList.find((pageItem) => pageItem[0] === currentTabPagePath); // 找到该tabBar对应在pageList中的一项
+        const currentTabBar = pageList.find(pageItem => pageItem[0] === currentTabPagePath); // 找到该tabBar对应在pageList中的一项
         if (currentTabBar) {
-            const childStackList = pageList.filter((pathItem) => tabBarRouterNames.indexOf(pathItem[0]) < 0); // 将不存在于tabBar.list里的page作为子stack page
+            const childStackList = pageList.filter(pathItem => tabBarRouterNames.indexOf(pathItem[0]) < 0); // 将不存在于tabBar.list里的page作为子stack page
             let stackPageList = [];
             stackPageList.push(currentTabBar);
             stackPageList = stackPageList.concat(childStackList);
             routerConfig[currentTabBar[0]] = getStackNavigator(stackPageList, navigationOptions);
         }
     });
-    console.log('routerConfig', routerConfig);
     return routerConfig;
 }
 // 获取Stack类型路由配置
 function getStackRouterConfig(pageList) {
     const routerConfig = {};
-    pageList.forEach((item) => {
+    pageList.forEach(item => {
         const key = item[0];
         const value = item[1];
         routerConfig[key] = value;
@@ -70,9 +69,8 @@ function getBottomTabNavigator(pageList, tabBar, navigationOptions) {
         defaultNavigationOptions: ({ navigation }) => ({
             tabBarIcon: ({ focused, horizontal, tintColor }) => {
                 const { routeName } = navigation.state;
-                const tabBarListItem = tabBar.list.find((item) => item.pagePath === routeName);
-                const tabBarIndex = tabBar.list.findIndex((item) => item.pagePath === routeName) + 1;
-                console.log('tabBarIndex', tabBarIndex);
+                const tabBarListItem = tabBar.list.find(item => item.pagePath === routeName);
+                const tabBarIndex = tabBar.list.findIndex(item => item.pagePath === routeName) + 1;
                 return (react_1.default.createElement(HomeIconWithBadge_1.default, { focused: focused, icon: tabBarListItem && tabBarListItem.iconPath, selectedIcon: tabBarListItem && tabBarListItem.selectedIconPath, text: tabBarListItem && tabBarListItem.text, color: tabBar.color, selectedColor: tabBar.selectedColor }));
             },
             tabBarVisible: getTabBarVisible(navigation),
@@ -117,13 +115,31 @@ function createRouter(pageList, appConfig) {
         return react_navigation_1.createAppContainer(getStackNavigator(pageList, navigationOptions));
     }
 }
+// gets the current screen from navigation state
+function getActiveRouteName(navigationState) {
+    if (!navigationState) {
+        return null;
+    }
+    const route = navigationState.routes[navigationState.index];
+    // dive into nested navigators
+    if (route.routes) {
+        return getActiveRouteName(route);
+    }
+    return route.routeName;
+}
 const initRouter = (pageList, Taro, appConfig) => {
     const AppContainer = createRouter(pageList, appConfig);
-    const element = (react_1.default.createElement(AppContainer, { theme: "light", ref: (navigatorRef) => {
+    const element = (react_1.default.createElement(AppContainer, { theme: "light", ref: navigatorRef => {
             NavigationService_1.default.setTopLevelNavigator(navigatorRef);
+        }, onNavigationStateChange: (prevState, currentState, action) => {
+            const currentRouteName = getActiveRouteName(currentState);
+            const previousRouteName = getActiveRouteName(prevState);
+            NavigationService_1.default.setCurrentRouteName(currentRouteName);
+            NavigationService_1.default.setPreviousRouteName(previousRouteName);
+            NavigationService_1.default.setRoutes(currentState.routes);
         } }));
     // 绑定Taro的路由跳转方法
-    bindTaroNavigate_1.default.bind(Taro);
+    TaroProvider_1.default.bind(Taro);
     return () => element;
 };
 exports.initRouter = initRouter;

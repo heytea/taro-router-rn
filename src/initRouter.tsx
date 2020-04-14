@@ -1,10 +1,10 @@
 import React from 'react';
 import HomeIconWithBadge from './HomeIconWithBadge';
-import { createAppContainer } from 'react-navigation';
+import { createAppContainer, NavigationState } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import NavigationService from './NavigationService';
-import bindTaroNavigate from './bindTaroNavigate';
+import TaroProvider from './TaroProvider';
 
 const HEADER_CONFIG_MAP: KV = {
   navigationBarTitleText: 'title', // 导航栏标题文字内容
@@ -22,7 +22,7 @@ function getNavigationOption(config: KV) {
   if (typeof config !== 'object') {
     return navigationOption;
   }
-  Object.keys(config).forEach((key) => {
+  Object.keys(config).forEach(key => {
     if (HEADER_CONFIG_MAP[key]) {
       navigationOption[HEADER_CONFIG_MAP[key]] = config[key];
     }
@@ -34,25 +34,26 @@ function getNavigationOption(config: KV) {
 function getTabBarRouterConfig(pageList: PageList, tabBar: TabBar, navigationOptions: KV) {
   const routerConfig: KV = {};
   const tabBarRouterNames = tabBar.list.reduce((acc, cur) => acc + ' ' + cur.pagePath, '');
-  tabBar.list.forEach((item) => {
+  tabBar.list.forEach(item => {
     const currentTabPagePath = item.pagePath;
-    const currentTabBar = pageList.find((pageItem) => pageItem[0] === currentTabPagePath); // 找到该tabBar对应在pageList中的一项
+    const currentTabBar = pageList.find(pageItem => pageItem[0] === currentTabPagePath); // 找到该tabBar对应在pageList中的一项
     if (currentTabBar) {
-      const childStackList = pageList.filter((pathItem) => tabBarRouterNames.indexOf(pathItem[0]) < 0); // 将不存在于tabBar.list里的page作为子stack page
+      const childStackList = pageList.filter(
+        pathItem => tabBarRouterNames.indexOf(pathItem[0]) < 0,
+      ); // 将不存在于tabBar.list里的page作为子stack page
       let stackPageList: PageList = [];
       stackPageList.push(currentTabBar);
       stackPageList = stackPageList.concat(childStackList);
       routerConfig[currentTabBar[0]] = getStackNavigator(stackPageList, navigationOptions);
     }
   });
-  console.log('routerConfig', routerConfig);
   return routerConfig;
 }
 
 // 获取Stack类型路由配置
 function getStackRouterConfig(pageList: PageList) {
   const routerConfig: KV = {};
-  pageList.forEach((item) => {
+  pageList.forEach(item => {
     const key = item[0];
     const value = item[1];
     routerConfig[key] = value;
@@ -70,9 +71,8 @@ function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOpt
     defaultNavigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ focused, horizontal, tintColor }) => {
         const { routeName } = navigation.state;
-        const tabBarListItem = tabBar.list.find((item) => item.pagePath === routeName);
-        const tabBarIndex = tabBar.list.findIndex((item) => item.pagePath === routeName) + 1;
-        console.log('tabBarIndex', tabBarIndex);
+        const tabBarListItem = tabBar.list.find(item => item.pagePath === routeName);
+        const tabBarIndex = tabBar.list.findIndex(item => item.pagePath === routeName) + 1;
 
         return (
           <HomeIconWithBadge
@@ -136,18 +136,38 @@ function createRouter(pageList: PageList, appConfig: any) {
   }
 }
 
+// gets the current screen from navigation state
+function getActiveRouteName(navigationState: NavigationState): string | null {
+  if (!navigationState) {
+    return null;
+  }
+  const route = navigationState.routes[navigationState.index];
+  // dive into nested navigators
+  if (route.routes) {
+    return getActiveRouteName(route);
+  }
+  return route.routeName;
+}
+
 const initRouter = (pageList: PageList, Taro: Taro, appConfig: any) => {
   const AppContainer = createRouter(pageList, appConfig);
   const element = (
     <AppContainer
       theme="light"
-      ref={(navigatorRef) => {
+      ref={navigatorRef => {
         NavigationService.setTopLevelNavigator(navigatorRef);
+      }}
+      onNavigationStateChange={(prevState, currentState, action) => {
+        const currentRouteName = getActiveRouteName(currentState);
+        const previousRouteName = getActiveRouteName(prevState);
+        NavigationService.setCurrentRouteName(currentRouteName);
+        NavigationService.setPreviousRouteName(previousRouteName);
+        NavigationService.setRoutes(currentState.routes);
       }}
     />
   );
   // 绑定Taro的路由跳转方法
-  bindTaroNavigate.bind(Taro);
+  TaroProvider.bind(Taro);
   return () => element;
 };
 
