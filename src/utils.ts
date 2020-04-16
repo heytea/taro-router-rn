@@ -7,6 +7,33 @@ export type SuccessFun = () => void;
 export type FailFun = (error: Error) => void;
 export type CompleteFun = () => void;
 
+export interface NavigationOption {
+  success?: SuccessFun;
+  fail?: FailFun;
+  complete?: CompleteFun;
+}
+
+export interface NavigateOption extends NavigationOption {
+  url?: string;
+}
+
+export interface NavigateBackOption extends NavigationOption {
+  delta?: number;
+}
+
+export interface NavigatorTabBarOption extends NavigationOption {
+  animation?: boolean;
+}
+
+export interface NavigatorTitleOption extends NavigationOption {
+  title?: string;
+}
+
+export interface NavigatorBarColorOption extends NavigationOption {
+  frontColor?: string;
+  backgroundColor?: string;
+}
+
 function upperCaseFirstLetter(string: string) {
   if (typeof string !== 'string') {
     return string;

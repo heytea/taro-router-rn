@@ -16,27 +16,6 @@ interface TabBar {
 type PageListItem = [string, any];
 type PageList = PageListItem[];
 
-interface NavigateOption {
-  url: string;
-  success?: () => void;
-  fail?: () => void;
-  complete?: () => void;
-}
-
-declare class Taro {
-  navigateTo(option: NavigateOption): void;
-  redirectTo(option: NavigateOption): void;
-  navigateBack(option: NavigateOption): void;
-  switchTab(option: NavigateOption): void;
-  getCurrentPages(): void;
-  reLaunch(option: NavigateOption): void;
-  showTabBar(): void;
-  hideTabBar(): void;
-  showTabBarRedDot(): void;
-  hideTabBarRedDot(): void;
-  setTabBarBadge(): void;
-  removeTabBarBadge(): void;
-  setTabBarItem(): void;
-}
+type Taro = any;
 
 type KV = { [key: string]: any };

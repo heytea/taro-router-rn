@@ -1,16 +1,8 @@
 import QueryString from 'query-string';
 import NavigationService from './NavigationService';
-import { errorHandler, successHandler, SuccessFun, FailFun, CompleteFun } from './utils';
+import { errorHandler, successHandler, NavigateOption, NavigateBackOption } from './utils';
 
-export interface NavigateOption {
-  url?: string;
-  success?: SuccessFun;
-  fail?: FailFun;
-  complete?: CompleteFun;
-  delta?: number;
-}
-
-export default class TaroProvider {
+export default class TaroNavigator {
   static bind(Taro: Taro) {
     Taro.navigateTo = this.wxNavigateTo.bind(this);
     Taro.redirectTo = this.wxRedirectTo.bind(this);
@@ -18,8 +10,14 @@ export default class TaroProvider {
     Taro.switchTab = this.wxSwitchTab.bind(this);
     Taro.getCurrentPages = this.wxGetCurrentPages.bind(this);
     Taro.reLaunch = this.wxReLaunch.bind(this);
-    // Taro.showTabBar = this.showTabBar.bind(this);
-    // Taro.hideTabBar = this.hideTabBar.bind(this);
+
+    // ✅Taro.showTabBar = this.showTabBar.bind(this);
+    // ✅Taro.hideTabBar = this.hideTabBar.bind(this);
+    // ✅Taro.setNavigationBarTitle = this.setNavigationBarTitle.bind(this);
+    // ✅Taro.setNavigationBarColor = this.setNavigationBarColor.bind(this);
+    // ✅Taro.showNavigationBarLoading = this.showNavigationBarLoading.bind(this);
+    // ✅Taro.hideNavigationBarLoading = this.hideNavigationBarLoading.bind(this);
+
     // Taro.showTabBarRedDot = this.showTabBarRedDot.bind(this);
     // Taro.hideTabBarRedDot = this.hideTabBarRedDot.bind(this);
     // Taro.setTabBarBadge = this.setTabBarBadge.bind(this);
@@ -66,7 +64,7 @@ export default class TaroProvider {
     return successHandler(success, complete);
   }
 
-  static wxNavigateBack(option?: NavigateOption) {
+  static wxNavigateBack(option?: NavigateBackOption) {
     let { delta = 1, success, fail, complete } = option || {};
     try {
       NavigationService.pop({ n: delta });
@@ -98,7 +96,7 @@ export default class TaroProvider {
   static wxGetCurrentPages() {
     const routes = NavigationService.getRoutes();
     if (routes.length > 0) {
-      return routes.map(item => {
+      return routes.map((item) => {
         return { route: item.routeName };
       });
     }

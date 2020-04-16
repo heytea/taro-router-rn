@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const query_string_1 = __importDefault(require("query-string"));
 const NavigationService_1 = __importDefault(require("./NavigationService"));
 const utils_1 = require("./utils");
-class TaroProvider {
+class TaroNavigator {
     static bind(Taro) {
         Taro.navigateTo = this.wxNavigateTo.bind(this);
         Taro.redirectTo = this.wxRedirectTo.bind(this);
@@ -14,8 +14,12 @@ class TaroProvider {
         Taro.switchTab = this.wxSwitchTab.bind(this);
         Taro.getCurrentPages = this.wxGetCurrentPages.bind(this);
         Taro.reLaunch = this.wxReLaunch.bind(this);
-        // Taro.showTabBar = this.showTabBar.bind(this);
-        // Taro.hideTabBar = this.hideTabBar.bind(this);
+        // ✅Taro.showTabBar = this.showTabBar.bind(this);
+        // ✅Taro.hideTabBar = this.hideTabBar.bind(this);
+        // ✅Taro.setNavigationBarTitle = this.setNavigationBarTitle.bind(this);
+        // ✅Taro.setNavigationBarColor = this.setNavigationBarColor.bind(this);
+        // ✅Taro.showNavigationBarLoading = this.showNavigationBarLoading.bind(this);
+        // ✅Taro.hideNavigationBarLoading = this.hideNavigationBarLoading.bind(this);
         // Taro.showTabBarRedDot = this.showTabBarRedDot.bind(this);
         // Taro.hideTabBarRedDot = this.hideTabBarRedDot.bind(this);
         // Taro.setTabBarBadge = this.setTabBarBadge.bind(this);
@@ -86,7 +90,7 @@ class TaroProvider {
     static wxGetCurrentPages() {
         const routes = NavigationService_1.default.getRoutes();
         if (routes.length > 0) {
-            return routes.map(item => {
+            return routes.map((item) => {
                 return { route: item.routeName };
             });
         }
@@ -108,4 +112,4 @@ class TaroProvider {
         return utils_1.successHandler(success, complete);
     }
 }
-exports.default = TaroProvider;
+exports.default = TaroNavigator;

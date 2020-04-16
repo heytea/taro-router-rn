@@ -10,6 +10,7 @@ import {
   NavigationNavigateActionPayload,
   NavigationPopActionPayload,
   NavigationRoute,
+  NavigationSetParamsActionPayload,
 } from 'react-navigation';
 
 let _navigator: NavigationContainerComponent | null;
@@ -31,6 +32,10 @@ const setPreviousRouteName = (name: string | null) => {
 
 const setRoutes = (routes: NavigationRoute[]) => {
   _routes = routes;
+};
+
+const setParams = (options: NavigationSetParamsActionPayload) => {
+  _navigator && _navigator.dispatch(NavigationActions.setParams(options));
 };
 
 const getNavigator = () => _navigator;
@@ -89,6 +94,7 @@ const NavigationService = {
   getPreviousRouteName,
   setRoutes,
   getRoutes,
+  setParams,
   getNavigator,
   navigate,
   push,

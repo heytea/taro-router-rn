@@ -17,6 +17,9 @@ const setPreviousRouteName = (name) => {
 const setRoutes = (routes) => {
     _routes = routes;
 };
+const setParams = (options) => {
+    _navigator && _navigator.dispatch(react_navigation_1.NavigationActions.setParams(options));
+};
 const getNavigator = () => _navigator;
 const getCurrentRouteName = () => _currentRouteName;
 const getPreviousRouteName = () => _previousRouteName;
@@ -62,6 +65,7 @@ const NavigationService = {
     getPreviousRouteName,
     setRoutes,
     getRoutes,
+    setParams,
     getNavigator,
     navigate,
     push,
