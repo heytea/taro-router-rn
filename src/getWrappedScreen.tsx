@@ -1,6 +1,19 @@
 import React from 'react';
-import { ScrollView, YellowBox, View, Text } from 'react-native';
-import { NavigationScreenProp, NavigationRoute, NavigationParams } from 'react-navigation';
+import {
+  ScrollView,
+  YellowBox,
+  View,
+  Text,
+  RefreshControl,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+} from 'react-native';
+import {
+  NavigationScreenProp,
+  NavigationRoute,
+  NavigationParams,
+  NavigationEventSubscription,
+} from 'react-navigation';
 import {
   errorHandler,
   successHandler,
@@ -10,16 +23,26 @@ import {
   NavigationOption,
 } from './utils';
 import LoadingView from './LoadingView';
+import { getNavigationOption } from './initRouter';
 
-function getWrappedScreen(Screen: any, Taro: Taro) {
+function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: Taro) {
   interface IProps {
     navigation: NavigationScreenProp<WrappedScreen>;
   }
-  interface IState {}
+  interface IState {
+    refreshing: boolean;
+  }
   class WrappedScreen extends React.Component<IProps, IState> {
+    private screenRef: React.RefObject<any>;
+    private subsDidFocus?: NavigationEventSubscription;
+    private subsWillBlur?: NavigationEventSubscription;
     constructor(props: IProps) {
       super(props);
       YellowBox.ignoreWarnings(['Calling `getNode()` on the ref of an Animated']);
+      this.screenRef = React.createRef<any>();
+      this.state = {
+        refreshing: false,
+      };
     }
 
     static navigationOptions = ({
@@ -28,7 +51,7 @@ function getWrappedScreen(Screen: any, Taro: Taro) {
       navigation: NavigationScreenProp<NavigationRoute<NavigationParams>, NavigationParams>;
     }) => {
       const options: any = {};
-      const title = navigation.getParam('_tabBarTitle', navigation.state.routeName);
+      const title = navigation.getParam('_tabBarTitle', '');
       const headerTintColor = navigation.getParam('_headerTintColor', undefined);
       if (headerTintColor) {
         options.headerTintColor = headerTintColor;
@@ -40,7 +63,7 @@ function getWrappedScreen(Screen: any, Taro: Taro) {
         };
       }
       const isNavigationBarLoadingShow = navigation.getParam('_isNavigationBarLoadingShow', false);
-      options.headerTitle = (
+      options.headerTitle = () => (
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {isNavigationBarLoadingShow && <LoadingView tintColor={headerTintColor} />}
           <Text
@@ -61,15 +84,56 @@ function getWrappedScreen(Screen: any, Taro: Taro) {
 
     componentDidMount() {
       this.initBinding();
+      this.subsDidFocus = this.props.navigation.addListener('didFocus', payload => {
+        this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
+      });
+      this.subsWillBlur = this.props.navigation.addListener('willBlur', payload => {
+        this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
+      });
+    }
+
+    componentWillUnmount() {
+      this.subsDidFocus && this.subsDidFocus.remove();
+      this.subsWillBlur && this.subsWillBlur.remove();
+    }
+
+    /**
+     * @description 如果 Screen 被包裹过（如：@connect），
+     * 需提供获取包裹前 Screen 实例的方法 getWrappedInstance 并暴露出被包裹组件的 config
+     * @returns {*}
+     */
+    private getScreenInstance() {
+      if (this.screenRef.current && this.screenRef.current.getWrappedInstance) {
+        return this.screenRef.current.getWrappedInstance() || {};
+      } else {
+        return this.screenRef.current || {};
+      }
     }
 
     private initBinding() {
-      Taro.showTabBar = this.showTabBar.bind(this);
-      Taro.hideTabBar = this.hideTabBar.bind(this);
+      // 导航栏
       Taro.setNavigationBarTitle = this.setNavigationBarTitle.bind(this);
       Taro.setNavigationBarColor = this.setNavigationBarColor.bind(this);
       Taro.showNavigationBarLoading = this.showNavigationBarLoading.bind(this);
       Taro.hideNavigationBarLoading = this.hideNavigationBarLoading.bind(this);
+      // 滚动
+      // 不支持RN Taro.pageScrollTo = this.pageScrollTo.bind(this);
+      // 下拉刷新
+      Taro.startPullDownRefresh = this.startPullDownRefresh.bind(this);
+      Taro.stopPullDownRefresh = this.stopPullDownRefresh.bind(this);
+      // TabBar
+      // Taro.setTabBarBadge = this.setTabBarBadge.bind(this);
+      // Taro.removeTabBarBadge = this.removeTabBarBadge.bind(this);
+      // Taro.showTabBarRedDot = this.showTabBarRedDot.bind(this);
+      // Taro.hideTabBarRedDot = this.hideTabBarRedDot.bind(this);
+      // Taro.setTabBarStyle = this.setTabBarStyle.bind(this);
+      // Taro.setTabBarItem = this.setTabBarItem.bind(this);
+      Taro.showTabBar = this.showTabBar.bind(this);
+      Taro.hideTabBar = this.hideTabBar.bind(this);
+      // 生命周期
+      // ✅componentDidShow
+      // ✅componentDidHide
+      // ✅onPullDownRefresh
     }
 
     private showTabBar(option?: NavigatorTabBarOption) {
@@ -147,14 +211,67 @@ function getWrappedScreen(Screen: any, Taro: Taro) {
       return successHandler(success, complete);
     }
 
+    private startPullDownRefresh(option?: NavigationOption) {
+      const { success, fail, complete } = option || {};
+      try {
+        this.setState({
+          refreshing: true,
+        });
+      } catch (error) {
+        return errorHandler(error, fail, complete);
+      }
+      return successHandler(success, complete);
+    }
+
+    private stopPullDownRefresh(option?: NavigationOption) {
+      const { success, fail, complete } = option || {};
+      try {
+        this.setState({
+          refreshing: false,
+        });
+      } catch (error) {
+        return errorHandler(error, fail, complete);
+      }
+      return successHandler(success, complete);
+    }
+
+    private onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      this;
+    };
+
+    private handlePullRefresh = () => {
+      this.setState({ refreshing: true });
+      this.getScreenInstance().onPullDownRefresh && this.getScreenInstance().onPullDownRefresh();
+    };
+
     render() {
-      console.log('1');
-      return (
+      const { enablePullDownRefresh, disableScroll } = getNavigationOption(Screen.config);
+      // 页面配置优先级 > 全局配置
+      let isScreenEnablePullDownRefresh =
+        enablePullDownRefresh === undefined
+          ? globalNavigationOptions.enablePullDownRefresh
+          : enablePullDownRefresh;
+      console.log('isScreenEnablePullDownRefresh', isScreenEnablePullDownRefresh);
+      return disableScroll ? (
+        <Screen {...this.props} />
+      ) : (
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{ minHeight: '100%' }}
-          alwaysBounceVertical>
-          <Screen {...this.props} />
+          alwaysBounceVertical
+          scrollEventThrottle={5}
+          onScroll={this.onScroll}
+          refreshControl={
+            isScreenEnablePullDownRefresh ? (
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this.handlePullRefresh}
+              />
+            ) : (
+              undefined
+            )
+          }>
+          <Screen ref={this.screenRef} {...this.props} />
         </ScrollView>
       );
     }

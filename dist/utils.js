@@ -41,9 +41,26 @@ function errorHandler(error, fail, complete) {
     return Promise.reject(error);
 }
 exports.errorHandler = errorHandler;
-exports.default = {
-    shouldBeObject,
-    isFunction,
-    successHandler,
-    errorHandler,
+exports.HEADER_CONFIG_MAP = {
+    navigationBarTitleText: 'title',
+    navigationBarTextStyle: 'headerTintColor',
+    navigationBarBackgroundColor: 'backgroundColor',
+    enablePullDownRefresh: 'enablePullDownRefresh',
+    navigationStyle: 'navigationStyle',
+    disableScroll: 'disableScroll',
+    backgroundColor: 'backgroundColor',
+    stackNavigatorOptions: 'stackNavigatorOptions',
 };
+function getNavigationOption(config) {
+    let navigationOption = {};
+    if (typeof config !== 'object') {
+        return navigationOption;
+    }
+    Object.keys(config).forEach(key => {
+        if (exports.HEADER_CONFIG_MAP[key]) {
+            navigationOption[exports.HEADER_CONFIG_MAP[key]] = config[key];
+        }
+    });
+    return navigationOption;
+}
+exports.getNavigationOption = getNavigationOption;

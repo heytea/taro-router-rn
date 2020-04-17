@@ -5,11 +5,11 @@
   "main": "./index.js",
   "files": [
     "dist",
-    "src",
-    "index.js"
+    "index.js",
+    "package.json"
   ],
   "scripts": {
-    "build": "yarn && rm -rf dist && mkdir dist && gulp",
+    "build": "yarn && rm -rf dist && mkdir dist && gulp && rm -rf node_modules/",
     "dev": "npm run build:static && tsc --watch",
     "prepack": "npm run build",
     "test": "jest"

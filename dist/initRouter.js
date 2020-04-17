@@ -11,29 +11,8 @@ const react_navigation_tabs_1 = require("react-navigation-tabs");
 const NavigationService_1 = __importDefault(require("./NavigationService"));
 const TaroNavigator_1 = __importDefault(require("./TaroNavigator"));
 const getWrappedScreen_1 = __importDefault(require("./getWrappedScreen"));
-const HEADER_CONFIG_MAP = {
-    navigationBarTitleText: 'title',
-    navigationBarTextStyle: 'headerTintColor',
-    navigationBarBackgroundColor: 'backgroundColor',
-    enablePullDownRefresh: 'enablePullDownRefresh',
-    navigationStyle: 'navigationStyle',
-    disableScroll: 'disableScroll',
-    backgroundColor: 'backgroundColor',
-    stackNavigatorOptions: 'stackNavigatorOptions',
-};
-function getNavigationOption(config) {
-    let navigationOption = {};
-    if (typeof config !== 'object') {
-        return navigationOption;
-    }
-    Object.keys(config).forEach(key => {
-        if (HEADER_CONFIG_MAP[key]) {
-            navigationOption[HEADER_CONFIG_MAP[key]] = config[key];
-        }
-    });
-    return navigationOption;
-}
-exports.getNavigationOption = getNavigationOption;
+const utils_1 = require("./utils");
+exports.getNavigationOption = utils_1.getNavigationOption;
 // 获取TabBar类型路由配置
 function getTabBarRouterConfig(pageList, tabBar, navigationOptions, Taro) {
     const routerConfig = {};
@@ -52,12 +31,12 @@ function getTabBarRouterConfig(pageList, tabBar, navigationOptions, Taro) {
     return routerConfig;
 }
 // 获取Stack类型路由配置
-function getStackRouterConfig(pageList, Taro) {
+function getStackRouterConfig(pageList, navigationOptions, Taro) {
     const routerConfig = {};
     pageList.forEach(item => {
         const key = item[0];
         const screen = item[1];
-        routerConfig[key] = getWrappedScreen_1.default(screen, Taro);
+        routerConfig[key] = getWrappedScreen_1.default(screen, navigationOptions, Taro);
     });
     return routerConfig;
 }
@@ -83,12 +62,6 @@ function getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro) {
             },
             tabBarVisible: getTabBarVisible(navigation),
         }),
-        navigationOptions: ({ navigation }) => {
-            console.log('haha');
-            return {
-                tabBarVisible: true,
-            };
-        },
         tabBarOptions: {
             showLabel: false,
             activeTintColor: tabBar.selectedColor || '#3cc51f',
@@ -104,7 +77,7 @@ function getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro) {
     });
 }
 function getStackNavigator(pageList, navigationOptions, Taro) {
-    const routerConfig = getStackRouterConfig(pageList, Taro);
+    const routerConfig = getStackRouterConfig(pageList, navigationOptions, Taro);
     // 让rn支持背景颜色设置,支持透明色
     // let stackNavigatorOptions = navigationOptions.stackNavigatorOptions || {};
     // let navigatorOptions = {
@@ -121,13 +94,14 @@ function getStackNavigator(pageList, navigationOptions, Taro) {
     //   ...stackNavigatorOptions,
     // };
     return react_navigation_stack_1.createStackNavigator(routerConfig, {
-        headerMode: 'float',
+        headerMode: 'screen',
     });
 }
 function createRouter(pageList, appConfig, Taro) {
     const { window } = appConfig;
     const tabBar = appConfig.tabBar;
-    const navigationOptions = getNavigationOption(window);
+    const navigationOptions = utils_1.getNavigationOption(window);
+    console.log('navigationOptions', navigationOptions);
     if (tabBar && tabBar.list && Array.isArray(tabBar.list) && tabBar.list.length > 0) {
         return react_navigation_1.createAppContainer(getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro));
     }
