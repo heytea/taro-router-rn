@@ -13,6 +13,7 @@ const TaroNavigator_1 = __importDefault(require("./TaroNavigator"));
 const getWrappedScreen_1 = __importDefault(require("./getWrappedScreen"));
 const utils_1 = require("./utils");
 exports.getNavigationOption = utils_1.getNavigationOption;
+const config_1 = require("./config");
 // 获取TabBar类型路由配置
 function getTabBarRouterConfig(pageList, tabBar, navigationOptions, Taro) {
     const routerConfig = {};
@@ -43,7 +44,6 @@ function getStackRouterConfig(pageList, navigationOptions, Taro) {
 // 底部导航栏是否显示
 function getTabBarVisible(navigation) {
     const currentRoute = navigation.state.routes[navigation.state.index];
-    console.log('currentRoute', currentRoute);
     const tabBarVisible = currentRoute.params ? currentRoute.params._tabBarVisible : undefined;
     if (typeof tabBarVisible === 'boolean') {
         return tabBarVisible;
@@ -57,22 +57,38 @@ function getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro) {
             tabBarIcon: ({ focused, horizontal, tintColor }) => {
                 const { routeName } = navigation.state;
                 const tabBarListItem = tabBar.list.find(item => item.pagePath === routeName);
-                // const tabBarIndex = tabBar.list.findIndex(item => item.pagePath === routeName) + 1;
-                return (react_1.default.createElement(HomeIconWithBadge_1.default, { focused: focused, icon: tabBarListItem && tabBarListItem.iconPath, selectedIcon: tabBarListItem && tabBarListItem.selectedIconPath, text: tabBarListItem && tabBarListItem.text, color: tabBar.color, selectedColor: tabBar.selectedColor }));
+                const tabBarIndex = tabBar.list.findIndex(item => item.pagePath === routeName);
+                return (react_1.default.createElement(HomeIconWithBadge_1.default, { index: tabBarIndex, focused: focused, icon: tabBarListItem && tabBarListItem.iconPath, selectedIcon: tabBarListItem && tabBarListItem.selectedIconPath, text: tabBarListItem && tabBarListItem.text, color: config_1._globalTabBarStyleConfig._tabColor ? config_1._globalTabBarStyleConfig._tabColor : tabBar.color, selectedColor: config_1._globalTabBarStyleConfig._tabSelectedColor
+                        ? config_1._globalTabBarStyleConfig._tabSelectedColor
+                        : tabBar.selectedColor }));
             },
             tabBarVisible: getTabBarVisible(navigation),
         }),
+        // tabBarOptions: {
+        //   showLabel: false,
+        //   activeTintColor: tabBar.selectedColor || '#3cc51f',
+        //   inactiveTintColor: tabBar.color || '#7A7E83',
+        //   activeBackgroundColor: tabBar.backgroundColor || '#ffffff',
+        //   inactiveBackgroundColor: tabBar.backgroundColor || '#ffffff',
+        //   style: tabBar.borderStyle
+        //     ? {
+        //         backgroundColor: tabBar.borderStyle,
+        //       }
+        //     : {},
+        // },
         tabBarOptions: {
             showLabel: false,
             activeTintColor: tabBar.selectedColor || '#3cc51f',
             inactiveTintColor: tabBar.color || '#7A7E83',
-            activeBackgroundColor: tabBar.backgroundColor || '#ffffff',
-            inactiveBackgroundColor: tabBar.backgroundColor || '#ffffff',
-            style: tabBar.borderStyle
-                ? {
-                    backgroundColor: tabBar.borderStyle,
-                }
-                : {},
+        },
+        tabBarComponent: props => {
+            const borderTopColor = !config_1._globalTabBarStyleConfig._tabBorderStyle || config_1._globalTabBarStyleConfig._tabBorderStyle === 'black'
+                ? '#cecece'
+                : '#fff';
+            return (react_1.default.createElement(react_navigation_tabs_1.BottomTabBar, Object.assign({}, props, { style: {
+                    backgroundColor: config_1._globalTabBarStyleConfig._tabBackgroundColor,
+                    borderTopColor,
+                } })));
         },
     });
 }
@@ -123,7 +139,7 @@ function getActiveRouteName(navigationState) {
 }
 const initRouter = (pageList, Taro, appConfig) => {
     const AppContainer = createRouter(pageList, appConfig, Taro);
-    const element = (react_1.default.createElement(AppContainer, { theme: "light", ref: navigatorRef => {
+    const element = (react_1.default.createElement(AppContainer, { ref: navigatorRef => {
             NavigationService_1.default.setTopLevelNavigator(navigatorRef);
             // 绑定Taro的路由跳转方法
             TaroNavigator_1.default.bind(Taro);

@@ -1,34 +1,23 @@
 import React from 'react';
 import HomeIconWithBadge from './HomeIconWithBadge';
-import {
-  createAppContainer,
-  NavigationState,
-  NavigationRoute,
-  NavigationParams,
-} from 'react-navigation';
+import { createAppContainer, NavigationState, NavigationRoute, NavigationParams } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
-import { createBottomTabNavigator, NavigationTabProp } from 'react-navigation-tabs';
+import { createBottomTabNavigator, NavigationTabProp, BottomTabBar } from 'react-navigation-tabs';
 import NavigationService from './NavigationService';
 import TaroNavigator from './TaroNavigator';
 import getWrappedScreen from './getWrappedScreen';
 import { getNavigationOption } from './utils';
+import { _globalTabBarStyleConfig } from './config';
 
 // 获取TabBar类型路由配置
-function getTabBarRouterConfig(
-  pageList: PageList,
-  tabBar: TabBar,
-  navigationOptions: KV,
-  Taro: Taro,
-) {
+function getTabBarRouterConfig(pageList: PageList, tabBar: TabBar, navigationOptions: KV, Taro: Taro) {
   const routerConfig: KV = {};
   const tabBarRouterNames = tabBar.list.reduce((acc, cur) => acc + ' ' + cur.pagePath, '');
   tabBar.list.forEach(item => {
     const currentTabPagePath = item.pagePath;
     const currentTabBar = pageList.find(pageItem => pageItem[0] === currentTabPagePath); // 找到该tabBar对应在pageList中的一项
     if (currentTabBar) {
-      const childStackList = pageList.filter(
-        pathItem => tabBarRouterNames.indexOf(pathItem[0]) < 0,
-      ); // 将不存在于tabBar.list里的page作为子stack page
+      const childStackList = pageList.filter(pathItem => tabBarRouterNames.indexOf(pathItem[0]) < 0); // 将不存在于tabBar.list里的page作为子stack page
       let stackPageList: PageList = [];
       stackPageList.push(currentTabBar);
       stackPageList = stackPageList.concat(childStackList);
@@ -52,7 +41,6 @@ function getStackRouterConfig(pageList: PageList, navigationOptions: KV, Taro: T
 // 底部导航栏是否显示
 function getTabBarVisible(navigation: NavigationTabProp<NavigationRoute<NavigationParams>, any>) {
   const currentRoute = navigation.state.routes[navigation.state.index];
-  console.log('currentRoute', currentRoute);
   const tabBarVisible = currentRoute.params ? currentRoute.params._tabBarVisible : undefined;
   if (typeof tabBarVisible === 'boolean') {
     return tabBarVisible;
@@ -60,44 +48,64 @@ function getTabBarVisible(navigation: NavigationTabProp<NavigationRoute<Navigati
   return navigation.state.index === 0;
 }
 
-function getBottomTabNavigator(
-  pageList: PageList,
-  tabBar: TabBar,
-  navigationOptions: object,
-  Taro: Taro,
-) {
+function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOptions: object, Taro: Taro) {
   const routerConfig = getTabBarRouterConfig(pageList, tabBar, navigationOptions, Taro);
   return createBottomTabNavigator(routerConfig, {
     defaultNavigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ focused, horizontal, tintColor }) => {
         const { routeName } = navigation.state;
         const tabBarListItem = tabBar.list.find(item => item.pagePath === routeName);
-        // const tabBarIndex = tabBar.list.findIndex(item => item.pagePath === routeName) + 1;
+        const tabBarIndex = tabBar.list.findIndex(item => item.pagePath === routeName);
 
         return (
           <HomeIconWithBadge
+            index={tabBarIndex}
             focused={focused}
             icon={tabBarListItem && tabBarListItem.iconPath}
             selectedIcon={tabBarListItem && tabBarListItem.selectedIconPath}
             text={tabBarListItem && tabBarListItem.text}
-            color={tabBar.color}
-            selectedColor={tabBar.selectedColor}
+            color={_globalTabBarStyleConfig._tabColor ? _globalTabBarStyleConfig._tabColor : tabBar.color}
+            selectedColor={
+              _globalTabBarStyleConfig._tabSelectedColor
+                ? _globalTabBarStyleConfig._tabSelectedColor
+                : tabBar.selectedColor
+            }
           />
         );
       },
       tabBarVisible: getTabBarVisible(navigation),
     }),
+    // tabBarOptions: {
+    //   showLabel: false,
+    //   activeTintColor: tabBar.selectedColor || '#3cc51f',
+    //   inactiveTintColor: tabBar.color || '#7A7E83',
+    //   activeBackgroundColor: tabBar.backgroundColor || '#ffffff',
+    //   inactiveBackgroundColor: tabBar.backgroundColor || '#ffffff',
+    //   style: tabBar.borderStyle
+    //     ? {
+    //         backgroundColor: tabBar.borderStyle,
+    //       }
+    //     : {},
+    // },
     tabBarOptions: {
       showLabel: false,
       activeTintColor: tabBar.selectedColor || '#3cc51f',
       inactiveTintColor: tabBar.color || '#7A7E83',
-      activeBackgroundColor: tabBar.backgroundColor || '#ffffff',
-      inactiveBackgroundColor: tabBar.backgroundColor || '#ffffff',
-      style: tabBar.borderStyle
-        ? {
-            backgroundColor: tabBar.borderStyle,
-          }
-        : {},
+    },
+    tabBarComponent: props => {
+      const borderTopColor =
+        !_globalTabBarStyleConfig._tabBorderStyle || _globalTabBarStyleConfig._tabBorderStyle === 'black'
+          ? '#cecece'
+          : '#fff';
+      return (
+        <BottomTabBar
+          {...props}
+          style={{
+            backgroundColor: _globalTabBarStyleConfig._tabBackgroundColor,
+            borderTopColor,
+          }}
+        />
+      );
     },
   });
 }
@@ -159,7 +167,6 @@ const initRouter = (pageList: PageList, Taro: Taro, appConfig: any) => {
   const AppContainer = createRouter(pageList, appConfig, Taro);
   const element = (
     <AppContainer
-      theme="light"
       ref={navigatorRef => {
         NavigationService.setTopLevelNavigator(navigatorRef);
         // 绑定Taro的路由跳转方法
