@@ -52,7 +52,7 @@ function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOpt
   const routerConfig = getTabBarRouterConfig(pageList, tabBar, navigationOptions, Taro);
   return createBottomTabNavigator(routerConfig, {
     defaultNavigationOptions: ({ navigation }) => ({
-      tabBarIcon: ({ focused, horizontal, tintColor }) => {
+      tabBarIcon: ({ focused }) => {
         const { routeName } = navigation.state;
         const tabBarListItem = tabBar.list.find(item => item.pagePath === routeName);
         const tabBarIndex = tabBar.list.findIndex(item => item.pagePath === routeName);
@@ -75,24 +75,16 @@ function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOpt
       },
       tabBarVisible: getTabBarVisible(navigation),
     }),
-    // tabBarOptions: {
-    //   showLabel: false,
-    //   activeTintColor: tabBar.selectedColor || '#3cc51f',
-    //   inactiveTintColor: tabBar.color || '#7A7E83',
-    //   activeBackgroundColor: tabBar.backgroundColor || '#ffffff',
-    //   inactiveBackgroundColor: tabBar.backgroundColor || '#ffffff',
-    //   style: tabBar.borderStyle
-    //     ? {
-    //         backgroundColor: tabBar.borderStyle,
-    //       }
-    //     : {},
-    // },
     tabBarOptions: {
       showLabel: false,
       activeTintColor: tabBar.selectedColor || '#3cc51f',
       inactiveTintColor: tabBar.color || '#7A7E83',
     },
     tabBarComponent: props => {
+      let bgColor = tabBar.backgroundColor || '#ffffff';
+      if (_globalTabBarStyleConfig._tabBackgroundColor) {
+        bgColor = _globalTabBarStyleConfig._tabBackgroundColor;
+      }
       const borderTopColor =
         !_globalTabBarStyleConfig._tabBorderStyle || _globalTabBarStyleConfig._tabBorderStyle === 'black'
           ? '#cecece'
@@ -101,7 +93,7 @@ function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOpt
         <BottomTabBar
           {...props}
           style={{
-            backgroundColor: _globalTabBarStyleConfig._tabBackgroundColor,
+            backgroundColor: bgColor,
             borderTopColor,
           }}
         />
@@ -112,29 +104,8 @@ function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOpt
 
 function getStackNavigator(pageList: PageList, navigationOptions: KV, Taro: Taro) {
   const routerConfig = getStackRouterConfig(pageList, navigationOptions, Taro);
-  // 让rn支持背景颜色设置,支持透明色
-  // let stackNavigatorOptions = navigationOptions.stackNavigatorOptions || {};
-  // let navigatorOptions = {
-  //   cardStyle: {
-  //     // 第一层颜色设置
-  //     backgroundColor: navigationOptions.backgroundColor,
-  //   },
-  //   transitionConfig: () => ({
-  //     containerStyle: {
-  //       // 第二层颜色设置
-  //       backgroundColor: navigationOptions.backgroundColor,
-  //     },
-  //   }),
-  //   ...stackNavigatorOptions,
-  // };
   return createStackNavigator(routerConfig, {
     headerMode: 'screen',
-    // ...navigatorOptions,
-    // navigationOptions: ({ navigation }) => {
-    //   return {
-    //     tabBarVisible: true,
-    //   };
-    // },
   });
 }
 
@@ -172,7 +143,7 @@ const initRouter = (pageList: PageList, Taro: Taro, appConfig: any) => {
         // 绑定Taro的路由跳转方法
         TaroNavigator.bind(Taro);
       }}
-      onNavigationStateChange={(prevState, currentState, action) => {
+      onNavigationStateChange={(prevState, currentState) => {
         const currentRouteName = getActiveRouteName(currentState);
         const previousRouteName = getActiveRouteName(prevState);
         NavigationService.setCurrentRouteName(currentRouteName);

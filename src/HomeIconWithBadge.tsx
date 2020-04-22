@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { _globalTabBarBadgeConfig, _globalTabBarRedDotConfig, _globalTabBarItemConfig } from './config';
+import { isUrl } from './utils';
 
 export interface HomeIconWithBadgeProps {
   index: number;
@@ -25,14 +26,28 @@ export default class HomeIconWithBadge extends React.Component<HomeIconWithBadge
     const redDotValue = _globalTabBarRedDotConfig[`${index}`];
     const shouldBadge = badgeValue && (redDotValue ? badgeValue._stackIndex > redDotValue._stackIndex : true);
     const shouldRedDot = redDotValue && (badgeValue ? redDotValue._stackIndex > badgeValue._stackIndex : true);
+    const { _tabBarBadgeText = '' } = badgeValue || {};
+    const badgeText = _tabBarBadgeText.length > 4 ? '...' : _tabBarBadgeText;
 
     // 动态设置 tabBar 某一项的内容
-    const dynamicText = _globalTabBarItemConfig[`${index}`] && _globalTabBarItemConfig[`${index}`]._tabBarItemText;
+    const tabBarItemValue = _globalTabBarItemConfig[`${index}`];
+    const dynamicText = tabBarItemValue && tabBarItemValue._tabBarItemText;
+    const dynamicIconPath = tabBarItemValue && tabBarItemValue._tabBarItemIconPath;
+    const dynamicSelectedIconPath = tabBarItemValue && tabBarItemValue._tabBarItemSelectedIconPath;
+
+    let iconPath = icon;
+    if (dynamicIconPath) {
+      iconPath = isUrl(dynamicIconPath) ? { uri: dynamicIconPath } : dynamicIconPath;
+    }
+    let selectIconPath = selectedIcon;
+    if (dynamicSelectedIconPath) {
+      selectIconPath = isUrl(dynamicSelectedIconPath) ? { uri: dynamicSelectedIconPath } : dynamicSelectedIconPath;
+    }
 
     return (
       <View style={styles.container}>
         <View style={styles.body}>
-          <Image style={styles.img} source={focused ? selectedIcon : icon} />
+          <Image style={styles.img} source={focused ? selectIconPath : iconPath} />
           <Text style={[styles.text, { color: focused ? selectedColor : color }]}>
             {dynamicText ? dynamicText : text}
           </Text>
@@ -40,7 +55,7 @@ export default class HomeIconWithBadge extends React.Component<HomeIconWithBadge
         {/* Badge */}
         {shouldBadge && (
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>{badgeValue._tabBarBadgeText}</Text>
+            <Text style={styles.badgeText}>{badgeText}</Text>
           </View>
         )}
         {/* RedDot */}
@@ -88,10 +103,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 100,
+    padding: 2,
   },
   badgeText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: 10,
   },
   reddot: {
     position: 'absolute',

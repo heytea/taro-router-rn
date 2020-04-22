@@ -1,74 +1,3 @@
-export interface ParamResult {
-  res: boolean;
-  msg?: string;
-}
-
-export type SuccessFun = () => void;
-export type FailFun = (error: Error) => void;
-export type CompleteFun = () => void;
-
-export interface NavigationOption {
-  success?: SuccessFun;
-  fail?: FailFun;
-  complete?: CompleteFun;
-}
-
-export interface NavigateOption extends NavigationOption {
-  url?: string;
-}
-
-export interface NavigateBackOption extends NavigationOption {
-  delta?: number;
-}
-
-export interface NavigatorTabBarOption extends NavigationOption {
-  animation?: boolean;
-}
-
-export interface NavigatorTitleOption extends NavigationOption {
-  title?: string;
-}
-
-export interface NavigatorBarColorOption extends NavigationOption {
-  frontColor?: string;
-  backgroundColor?: string;
-}
-
-export interface NavigatorBadgeOption extends NavigateOption {
-  index: number;
-  text: string;
-}
-
-export interface NavigatorRedDotOption extends NavigateOption {
-  index: number;
-}
-
-export interface NavigatorBadgeRemoveOption extends NavigateOption {
-  index: number;
-}
-
-export interface NavigatorStyleOption extends NavigateOption {
-  /** tab 上的文字默认颜色，HexColor */
-  color?: string;
-  /** tab 上的文字选中时的颜色，HexColor */
-  selectedColor?: string;
-  /** tab 的背景色，HexColor */
-  backgroundColor?: string;
-  /** tabBar上边框的颜色， 仅支持 black/white */
-  borderStyle?: 'black' | 'white';
-}
-
-export interface NavigatorItemOption extends NavigateOption {
-  /** tabBar 的哪一项，从左边算起 */
-  index: number;
-  /** tab 上的按钮文字 */
-  text?: string;
-  /** 图片路径，icon 大小限制为 40kb，建议尺寸为 81px * 81px，当 postion 为 top 时，此参数无效 */
-  iconPath?: string;
-  /** 选中时的图片路径，icon 大小限制为 40kb，建议尺寸为 81px * 81px ，当 postion 为 top 时，此参数无效 */
-  selectedIconPath?: string;
-}
-
 function upperCaseFirstLetter(string: string) {
   if (typeof string !== 'string') {
     return string;
@@ -108,6 +37,32 @@ export function shouldBeObject(target: any): ParamResult {
 
 export function isFunction(f: any) {
   return typeof f === 'function';
+}
+
+export function isUrl(value: string) {
+  const protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
+
+  const localhostDomainRE = /^localhost[:?\d]*(?:[^:?\d]\S*)?$/;
+  const nonLocalhostDomainRE = /^[^\s.]+\.\S{2,}$/;
+  if (typeof value !== 'string') {
+    return false;
+  }
+
+  let match = value.match(protocolAndDomainRE);
+  if (!match) {
+    return false;
+  }
+
+  let everythingAfterProtocol = match[1];
+  if (!everythingAfterProtocol) {
+    return false;
+  }
+
+  if (localhostDomainRE.test(everythingAfterProtocol) || nonLocalhostDomainRE.test(everythingAfterProtocol)) {
+    return true;
+  }
+
+  return false;
 }
 
 export function successHandler(success?: SuccessFun, complete?: CompleteFun): Promise<boolean> {

@@ -1,27 +1,7 @@
 import React from 'react';
-import {
-  ScrollView,
-  YellowBox,
-  View,
-  Text,
-  RefreshControl,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-} from 'react-native';
+import { ScrollView, YellowBox, View, Text, RefreshControl } from 'react-native';
 import { NavigationScreenProp, NavigationRoute, NavigationParams, NavigationEventSubscription } from 'react-navigation';
-import {
-  errorHandler,
-  successHandler,
-  NavigatorTabBarOption,
-  NavigatorTitleOption,
-  NavigatorBarColorOption,
-  NavigationOption,
-  NavigatorBadgeOption,
-  NavigatorBadgeRemoveOption,
-  NavigatorRedDotOption,
-  NavigatorStyleOption,
-  NavigatorItemOption,
-} from './utils';
+import { errorHandler, successHandler } from './utils';
 import LoadingView from './LoadingView';
 import { getNavigationOption } from './initRouter';
 import {
@@ -90,7 +70,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       return options;
     };
 
-    componentDidMount() {
+    UNSAFE_componentWillMount() {
       this.initBinding();
       this.subsDidFocus = this.props.navigation.addListener('didFocus', payload => {
         this.initBinding();
@@ -226,10 +206,6 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       }
       return successHandler(success, complete);
     }
-
-    private onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      this;
-    };
 
     /**
      * 为 tabBar 某一项的右上角添加文本
@@ -383,7 +359,6 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
             contentContainerStyle={{ minHeight: '100%' }}
             alwaysBounceVertical
             scrollEventThrottle={5}
-            onScroll={this.onScroll}
             refreshControl={
               isScreenEnablePullDownRefresh ? (
                 <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handlePullRefresh} />

@@ -14,9 +14,6 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
     class WrappedScreen extends react_1.default.Component {
         constructor(props) {
             super(props);
-            this.onScroll = (event) => {
-                this;
-            };
             this.handlePullRefresh = () => {
                 this.setState({ refreshing: true });
                 this.getScreenInstance().onPullDownRefresh && this.getScreenInstance().onPullDownRefresh();
@@ -27,7 +24,7 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
                 refreshing: false,
             };
         }
-        componentDidMount() {
+        UNSAFE_componentWillMount() {
             this.initBinding();
             this.subsDidFocus = this.props.navigation.addListener('didFocus', payload => {
                 this.initBinding();
@@ -298,7 +295,7 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             let isScreenEnablePullDownRefresh = enablePullDownRefresh === undefined ? globalNavigationOptions.enablePullDownRefresh : enablePullDownRefresh;
             return disableScroll ? (react_1.default.createElement(react_native_safe_area_context_1.SafeAreaView, { style: { height: '100%', width: '100%' } },
                 react_1.default.createElement(Screen, Object.assign({}, this.props)))) : (react_1.default.createElement(react_native_safe_area_context_1.SafeAreaView, { style: { height: '100%', width: '100%' } },
-                react_1.default.createElement(react_native_1.ScrollView, { style: { flex: 1 }, contentContainerStyle: { minHeight: '100%' }, alwaysBounceVertical: true, scrollEventThrottle: 5, onScroll: this.onScroll, refreshControl: isScreenEnablePullDownRefresh ? (react_1.default.createElement(react_native_1.RefreshControl, { refreshing: this.state.refreshing, onRefresh: this.handlePullRefresh })) : (undefined) },
+                react_1.default.createElement(react_native_1.ScrollView, { style: { flex: 1 }, contentContainerStyle: { minHeight: '100%' }, alwaysBounceVertical: true, scrollEventThrottle: 5, refreshControl: isScreenEnablePullDownRefresh ? (react_1.default.createElement(react_native_1.RefreshControl, { refreshing: this.state.refreshing, onRefresh: this.handlePullRefresh })) : (undefined) },
                     react_1.default.createElement(Screen, Object.assign({ ref: this.screenRef }, this.props)))));
         }
     }

@@ -29,6 +29,27 @@ function isFunction(f) {
     return typeof f === 'function';
 }
 exports.isFunction = isFunction;
+function isUrl(value) {
+    const protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
+    const localhostDomainRE = /^localhost[:?\d]*(?:[^:?\d]\S*)?$/;
+    const nonLocalhostDomainRE = /^[^\s.]+\.\S{2,}$/;
+    if (typeof value !== 'string') {
+        return false;
+    }
+    let match = value.match(protocolAndDomainRE);
+    if (!match) {
+        return false;
+    }
+    let everythingAfterProtocol = match[1];
+    if (!everythingAfterProtocol) {
+        return false;
+    }
+    if (localhostDomainRE.test(everythingAfterProtocol) || nonLocalhostDomainRE.test(everythingAfterProtocol)) {
+        return true;
+    }
+    return false;
+}
+exports.isUrl = isUrl;
 function successHandler(success, complete) {
     success && isFunction(success) && success();
     complete && isFunction(complete) && complete();

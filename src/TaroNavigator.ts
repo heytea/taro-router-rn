@@ -1,6 +1,6 @@
 import QueryString from 'query-string';
 import NavigationService from './NavigationService';
-import { errorHandler, successHandler, NavigateOption, NavigateBackOption } from './utils';
+import { errorHandler, successHandler } from './utils';
 
 export default class TaroNavigator {
   static bind(Taro: Taro) {
@@ -15,9 +15,7 @@ export default class TaroNavigator {
   static wxNavigateTo(option: NavigateOption) {
     let { url, success, fail, complete } = option;
     if (!url) {
-      return Promise.reject(
-        new Error('wxNavigateTo(option: NavigateOption) option.url is undefined'),
-      );
+      return Promise.reject(new Error('wxNavigateTo(option: NavigateOption) option.url is undefined'));
     }
     if (url.startsWith('/')) {
       url = url.substr(1);
@@ -34,9 +32,7 @@ export default class TaroNavigator {
   static wxRedirectTo(option: NavigateOption) {
     let { url, success, fail, complete } = option;
     if (!url) {
-      return Promise.reject(
-        new Error('wxNavigateTo(option: NavigateOption) option.url is undefined'),
-      );
+      return Promise.reject(new Error('wxNavigateTo(option: NavigateOption) option.url is undefined'));
     }
     if (url.startsWith('/')) {
       url = url.substr(1);
@@ -64,9 +60,7 @@ export default class TaroNavigator {
   static wxSwitchTab(option: NavigateOption) {
     let { url, success, fail, complete } = option;
     if (!url) {
-      return Promise.reject(
-        new Error('wxNavigateTo(option: NavigateOption) option.url is undefined'),
-      );
+      return Promise.reject(new Error('wxNavigateTo(option: NavigateOption) option.url is undefined'));
     }
     if (url.startsWith('/')) {
       url = url.substr(1);
