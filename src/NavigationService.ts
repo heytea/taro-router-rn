@@ -1,108 +1,54 @@
-import {
-  NavigationActions,
-  StackActions,
-  NavigationContainerComponent,
-  NavigationPopToTopActionPayload,
-  NavigationReplaceActionPayload,
-  NavigationResetActionPayload,
-  NavigationBackActionPayload,
-  NavigationPushActionPayload,
-  NavigationNavigateActionPayload,
-  NavigationPopActionPayload,
-  NavigationRoute,
-  NavigationSetParamsActionPayload,
-} from 'react-navigation';
+import React from 'react';
+import { StackActions, CommonActions } from '@react-navigation/native';
 
-let _navigator: NavigationContainerComponent | null;
-let _currentRouteName: string | null;
-let _previousRouteName: string | null;
-let _routes: NavigationRoute[] = [];
+export const navigationRef = React.createRef<any>();
+interface NavigationParams {
+  [key: string]: any;
+}
+interface NavigationNavigateActionPayload {
+  routeName: string;
+  params?: NavigationParams;
+  key?: string;
+}
+interface NavigationNavigatePopPayload {
+  n?: number;
+}
+function navigate(option: NavigationNavigateActionPayload) {
+  navigationRef.current &&
+    navigationRef.current.dispatch(CommonActions.navigate({ name: option.routeName, params: option.params }));
+}
 
-const setTopLevelNavigator = (navigatorRef: NavigationContainerComponent | null) => {
-  _navigator = navigatorRef;
-};
+function push(option: NavigationNavigateActionPayload) {
+  navigationRef.current && navigationRef.current.dispatch(StackActions.push(option.routeName, option.params));
+}
 
-const setCurrentRouteName = (name: string | null) => {
-  _currentRouteName = name;
-};
+function goBack() {
+  navigationRef.current && navigationRef.current.dispatch(CommonActions.goBack());
+}
 
-const setPreviousRouteName = (name: string | null) => {
-  _previousRouteName = name;
-};
+// export function reset(option: NavigationResetActionPayload) {
+//   navigationRef.current &&
+//     navigationRef.current.dispatch(CommonActions.reset({ index: option.index, routes: option.actions }));
+// }
 
-const setRoutes = (routes: NavigationRoute[]) => {
-  _routes = routes;
-};
+function replace(option: NavigationNavigateActionPayload) {
+  navigationRef.current && navigationRef.current.dispatch(StackActions.replace(option.routeName, option.params));
+}
 
-const setParams = (options: NavigationSetParamsActionPayload) => {
-  _navigator && _navigator.dispatch(NavigationActions.setParams(options));
-};
+function popToTop() {
+  navigationRef.current && navigationRef.current.dispatch(StackActions.popToTop());
+}
 
-const getNavigator = () => _navigator;
+function pop(option: NavigationNavigatePopPayload) {
+  const { n = 1 } = option || {};
+  navigationRef.current && navigationRef.current.dispatch(StackActions.pop(n));
+}
 
-const getCurrentRouteName = () => _currentRouteName;
-
-const getPreviousRouteName = () => _previousRouteName;
-
-const getRoutes = () => _routes;
-
-/**
- * 会复用栈内已存在的页面
- * @param routeName
- * @param params
- */
-const navigate = (options: NavigationNavigateActionPayload) => {
-  _navigator && _navigator.dispatch(NavigationActions.navigate(options));
-};
-
-/**
- * 无论如何都会向栈增加页面
- * @param routeName
- * @param params
- * @param action
- * @param key
- */
-const push = (options: NavigationPushActionPayload) => {
-  _navigator && _navigator.dispatch(StackActions.push(options));
-};
-
-const goBack = (options?: NavigationBackActionPayload) => {
-  _navigator && _navigator.dispatch(NavigationActions.back(options));
-};
-
-const reset = (options: NavigationResetActionPayload) => {
-  _navigator && _navigator.dispatch(StackActions.reset(options));
-};
-
-const replace = (options: NavigationReplaceActionPayload) => {
-  _navigator && _navigator.dispatch(StackActions.replace(options));
-};
-
-const popToTop = (options?: NavigationPopToTopActionPayload) => {
-  _navigator && _navigator.dispatch(StackActions.popToTop(options));
-};
-
-const pop = (options: NavigationPopActionPayload) => {
-  _navigator && _navigator.dispatch(StackActions.pop(options));
-};
-
-const NavigationService = {
-  setTopLevelNavigator,
-  setCurrentRouteName,
-  getCurrentRouteName,
-  setPreviousRouteName,
-  getPreviousRouteName,
-  setRoutes,
-  getRoutes,
-  setParams,
-  getNavigator,
+export default {
   navigate,
   push,
   goBack,
-  reset,
   replace,
   popToTop,
   pop,
 };
-
-export default NavigationService;

@@ -7,13 +7,18 @@ const query_string_1 = __importDefault(require("query-string"));
 const NavigationService_1 = __importDefault(require("./NavigationService"));
 const utils_1 = require("./utils");
 class TaroNavigator {
-    static bind(Taro) {
+    static bind(Taro, initRouteName) {
+        if (TaroNavigator.hasBind) {
+            return;
+        }
         Taro.navigateTo = this.wxNavigateTo;
         Taro.redirectTo = this.wxRedirectTo;
         Taro.navigateBack = this.wxNavigateBack;
         Taro.switchTab = this.wxSwitchTab;
         Taro.getCurrentPages = this.wxGetCurrentPages;
         Taro.reLaunch = this.wxReLaunch;
+        TaroNavigator.currentPages = [initRouteName];
+        TaroNavigator.hasBind = true;
     }
     static wxNavigateTo(option) {
         let { url, success, fail, complete } = option;
@@ -26,6 +31,7 @@ class TaroNavigator {
         let obj = query_string_1.default.parseUrl(url);
         try {
             NavigationService_1.default.push({ routeName: obj.url, params: obj.query });
+            TaroNavigator.currentPages.push(obj.url);
         }
         catch (error) {
             return utils_1.errorHandler(error, fail, complete);
@@ -43,6 +49,9 @@ class TaroNavigator {
         let obj = query_string_1.default.parseUrl(url);
         try {
             NavigationService_1.default.replace({ routeName: obj.url, params: obj.query });
+            if (TaroNavigator.currentPages.length > 0) {
+                TaroNavigator.currentPages[TaroNavigator.currentPages.length - 1] = obj.url;
+            }
         }
         catch (error) {
             return utils_1.errorHandler(error, fail, complete);
@@ -53,6 +62,10 @@ class TaroNavigator {
         let { delta = 1, success, fail, complete } = option || {};
         try {
             NavigationService_1.default.pop({ n: delta });
+            if (TaroNavigator.currentPages.length > 0) {
+                const end = TaroNavigator.currentPages.length - 1 - delta;
+                TaroNavigator.currentPages.slice(0, end);
+            }
         }
         catch (error) {
             return utils_1.errorHandler(error, fail, complete);
@@ -70,6 +83,7 @@ class TaroNavigator {
         let obj = query_string_1.default.parseUrl(url);
         try {
             NavigationService_1.default.navigate({ routeName: obj.url, params: obj.query });
+            TaroNavigator.currentPages.push(obj.url);
         }
         catch (error) {
             return utils_1.errorHandler(error, fail, complete);
@@ -77,23 +91,14 @@ class TaroNavigator {
         return utils_1.successHandler(success, complete);
     }
     static wxGetCurrentPages() {
-        const routes = NavigationService_1.default.getRoutes();
-        if (routes.length > 0) {
-            return routes.map(item => {
-                return { route: item.routeName };
-            });
-        }
-        return [];
+        return TaroNavigator.currentPages;
     }
     static wxReLaunch(option) {
-        let { url, success, fail, complete } = option;
-        const pages = this.wxGetCurrentPages();
-        const length = pages.length;
+        let { url = 'index', success, fail, complete } = option;
         try {
-            if (length > 0) {
-                this.wxNavigateBack({ delta: length });
-            }
+            NavigationService_1.default.popToTop();
             this.wxRedirectTo({ url });
+            TaroNavigator.currentPages = [url];
         }
         catch (error) {
             return utils_1.errorHandler(error, fail, complete);
@@ -101,4 +106,6 @@ class TaroNavigator {
         return utils_1.successHandler(success, complete);
     }
 }
+TaroNavigator.hasBind = false;
+TaroNavigator.currentPages = [];
 exports.default = TaroNavigator;

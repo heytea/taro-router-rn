@@ -3,13 +3,21 @@ import NavigationService from './NavigationService';
 import { errorHandler, successHandler } from './utils';
 
 export default class TaroNavigator {
-  static bind(Taro: Taro) {
+  static hasBind = false;
+  static currentPages: string[] = [];
+
+  static bind(Taro: Taro, initRouteName: string) {
+    if (TaroNavigator.hasBind) {
+      return;
+    }
     Taro.navigateTo = this.wxNavigateTo;
     Taro.redirectTo = this.wxRedirectTo;
     Taro.navigateBack = this.wxNavigateBack;
     Taro.switchTab = this.wxSwitchTab;
     Taro.getCurrentPages = this.wxGetCurrentPages;
     Taro.reLaunch = this.wxReLaunch;
+    TaroNavigator.currentPages = [initRouteName];
+    TaroNavigator.hasBind = true;
   }
 
   static wxNavigateTo(option: NavigateOption) {
@@ -23,6 +31,7 @@ export default class TaroNavigator {
     let obj = QueryString.parseUrl(url);
     try {
       NavigationService.push({ routeName: obj.url, params: obj.query });
+      TaroNavigator.currentPages.push(obj.url);
     } catch (error) {
       return errorHandler(error, fail, complete);
     }
@@ -41,6 +50,9 @@ export default class TaroNavigator {
     let obj = QueryString.parseUrl(url);
     try {
       NavigationService.replace({ routeName: obj.url, params: obj.query });
+      if (TaroNavigator.currentPages.length > 0) {
+        TaroNavigator.currentPages[TaroNavigator.currentPages.length - 1] = obj.url;
+      }
     } catch (error) {
       return errorHandler(error, fail, complete);
     }
@@ -51,6 +63,10 @@ export default class TaroNavigator {
     let { delta = 1, success, fail, complete } = option || {};
     try {
       NavigationService.pop({ n: delta });
+      if (TaroNavigator.currentPages.length > 0) {
+        const end = TaroNavigator.currentPages.length - 1 - delta;
+        TaroNavigator.currentPages.slice(0, end);
+      }
     } catch (error) {
       return errorHandler(error, fail, complete);
     }
@@ -68,6 +84,7 @@ export default class TaroNavigator {
     let obj = QueryString.parseUrl(url);
     try {
       NavigationService.navigate({ routeName: obj.url, params: obj.query });
+      TaroNavigator.currentPages.push(obj.url);
     } catch (error) {
       return errorHandler(error, fail, complete);
     }
@@ -75,24 +92,15 @@ export default class TaroNavigator {
   }
 
   static wxGetCurrentPages() {
-    const routes = NavigationService.getRoutes();
-    if (routes.length > 0) {
-      return routes.map(item => {
-        return { route: item.routeName };
-      });
-    }
-    return [];
+    return TaroNavigator.currentPages;
   }
 
   static wxReLaunch(option: NavigateOption) {
-    let { url, success, fail, complete } = option;
-    const pages = this.wxGetCurrentPages();
-    const length = pages.length;
+    let { url = 'index', success, fail, complete } = option;
     try {
-      if (length > 0) {
-        this.wxNavigateBack({ delta: length });
-      }
+      NavigationService.popToTop();
       this.wxRedirectTo({ url });
+      TaroNavigator.currentPages = [url];
     } catch (error) {
       return errorHandler(error, fail, complete);
     }

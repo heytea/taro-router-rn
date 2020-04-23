@@ -10,6 +10,7 @@ const LoadingView_1 = __importDefault(require("./LoadingView"));
 const initRouter_1 = require("./initRouter");
 const config_1 = require("./config");
 const react_native_safe_area_context_1 = require("react-native-safe-area-context");
+const TaroNavigator_1 = __importDefault(require("./TaroNavigator"));
 function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
     class WrappedScreen extends react_1.default.Component {
         constructor(props) {
@@ -24,19 +25,40 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
                 refreshing: false,
             };
         }
+        static getParam(route, key, defaultValue) {
+            if (!route || !route.params || !route.params[key]) {
+                return defaultValue;
+            }
+            return route.params[key];
+        }
         UNSAFE_componentWillMount() {
             this.initBinding();
-            this.subsDidFocus = this.props.navigation.addListener('didFocus', payload => {
+            this.subsDidFocus = this.props.navigation.addListener('focus', () => {
                 this.initBinding();
                 this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
             });
-            this.subsWillBlur = this.props.navigation.addListener('willBlur', payload => {
+            this.subsWillBlur = this.props.navigation.addListener('blur', () => {
                 this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
             });
+            // 4.x
+            // this.subsDidFocus = this.props.navigation.addListener('didFocus', payload => {
+            //   this.initBinding();
+            //   this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
+            // });
+            // this.subsWillBlur = this.props.navigation.addListener('willBlur', payload => {
+            //   this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
+            // });
+        }
+        componentDidMount() {
+            TaroNavigator_1.default.bind(Taro, this.props.route.name);
         }
         componentWillUnmount() {
-            this.subsDidFocus && this.subsDidFocus.remove();
-            this.subsWillBlur && this.subsWillBlur.remove();
+            // 5.x
+            this.subsDidFocus && this.subsDidFocus();
+            this.subsWillBlur && this.subsWillBlur();
+            // 4.x
+            // this.subsDidFocus && this.subsDidFocus.remove();
+            // this.subsWillBlur && this.subsWillBlur.remove();
         }
         /**
          * @description 如果 Screen 被包裹过（如：@connect），
@@ -58,7 +80,7 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             Taro.showNavigationBarLoading = this.showNavigationBarLoading.bind(this);
             Taro.hideNavigationBarLoading = this.hideNavigationBarLoading.bind(this);
             // 滚动
-            // 不支持RN Taro.pageScrollTo = this.pageScrollTo.bind(this);
+            // Taro.pageScrollTo = this.pageScrollTo.bind(this);
             // 下拉刷新
             Taro.startPullDownRefresh = this.startPullDownRefresh.bind(this); // 原Taro有bug
             Taro.stopPullDownRefresh = this.stopPullDownRefresh.bind(this);
@@ -264,12 +286,10 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             return utils_1.successHandler(success, complete);
         }
         showTabBar(option) {
-            const { animation = false, success, fail, complete } = option || {};
+            const { success, fail, complete } = option || {};
             try {
-                this.props.navigation.setParams({
-                    _tabBarVisible: true,
-                    _animation: animation,
-                });
+                config_1._globalTabBarVisibleConfig._tabBarVisible = true;
+                this.props.navigation.setParams(config_1._globalTabBarVisibleConfig);
             }
             catch (error) {
                 return utils_1.errorHandler(error, fail, complete);
@@ -277,12 +297,10 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             return utils_1.successHandler(success, complete);
         }
         hideTabBar(option) {
-            const { animation = false, success, fail, complete } = option || {};
+            const { success, fail, complete } = option || {};
             try {
-                this.props.navigation.setParams({
-                    _tabBarVisible: false,
-                    _animation: animation,
-                });
+                config_1._globalTabBarVisibleConfig._tabBarVisible = false;
+                this.props.navigation.setParams(config_1._globalTabBarVisibleConfig);
             }
             catch (error) {
                 return utils_1.errorHandler(error, fail, complete);
@@ -299,20 +317,22 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
                     react_1.default.createElement(Screen, Object.assign({ ref: this.screenRef }, this.props)))));
         }
     }
-    WrappedScreen.navigationOptions = ({ navigation, }) => {
+    WrappedScreen.lastTitle = '';
+    WrappedScreen.navigationOptions = ({ route }) => {
         const options = {};
-        const title = navigation.getParam('_tabBarTitle', '');
-        const headerTintColor = navigation.getParam('_headerTintColor', undefined);
+        const title = WrappedScreen.getParam(route, '_tabBarTitle', WrappedScreen.lastTitle);
+        WrappedScreen.lastTitle = title;
+        const headerTintColor = WrappedScreen.getParam(route, '_headerTintColor', undefined);
         if (headerTintColor) {
             options.headerTintColor = headerTintColor;
         }
-        const backgroundColor = navigation.getParam('_headerBackgroundColor', undefined);
+        const backgroundColor = WrappedScreen.getParam(route, '_headerBackgroundColor', undefined);
         if (backgroundColor) {
             options.headerStyle = {
                 backgroundColor,
             };
         }
-        const isNavigationBarLoadingShow = navigation.getParam('_isNavigationBarLoadingShow', false);
+        const isNavigationBarLoadingShow = WrappedScreen.getParam(route, '_isNavigationBarLoadingShow', false);
         options.headerTitle = () => (react_1.default.createElement(react_native_1.View, { style: { flexDirection: 'row', alignItems: 'center' } },
             isNavigationBarLoadingShow && react_1.default.createElement(LoadingView_1.default, { tintColor: headerTintColor }),
             react_1.default.createElement(react_native_1.Text, { style: {

@@ -1,3 +1,9 @@
+export interface TabBarVisibleConfig {
+  _tabBarVisible?: boolean;
+}
+
+const _globalTabBarVisibleConfig: TabBarVisibleConfig = {};
+
 export interface TabBarBadgeConfigValue {
   _tabBarBadgeIndex: number;
   _tabBarBadgeText: string;
@@ -54,6 +60,7 @@ type TabBarItemConfig = { [key: string]: TabBarItemValue };
 const _globalTabBarItemConfig: TabBarItemConfig = {};
 
 export {
+  _globalTabBarVisibleConfig,
   _globalTabBarBadgeConfig,
   _globalTabBarRedDotConfig,
   _methodStack,

@@ -13,6 +13,11 @@ interface TabBar {
   list: TabBarListItem[];
 }
 
+interface BottomTabConfig {
+  name: string;
+  element: JSX.Element;
+}
+
 type PageListItem = [string, any];
 type PageList = PageListItem[];
 

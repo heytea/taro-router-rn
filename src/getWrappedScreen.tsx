@@ -1,6 +1,5 @@
 import React from 'react';
 import { ScrollView, YellowBox, View, Text, RefreshControl } from 'react-native';
-import { NavigationScreenProp, NavigationRoute, NavigationParams, NavigationEventSubscription } from 'react-navigation';
 import { errorHandler, successHandler } from './utils';
 import LoadingView from './LoadingView';
 import { getNavigationOption } from './initRouter';
@@ -10,20 +9,23 @@ import {
   _methodStack,
   _globalTabBarStyleConfig,
   _globalTabBarItemConfig,
+  _globalTabBarVisibleConfig,
 } from './config';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import TaroNavigator from './TaroNavigator';
 
 function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: Taro) {
   interface IProps {
-    navigation: NavigationScreenProp<WrappedScreen>;
+    navigation: any;
+    route: any;
   }
   interface IState {
     refreshing: boolean;
   }
   class WrappedScreen extends React.Component<IProps, IState> {
     private screenRef: React.RefObject<any>;
-    private subsDidFocus?: NavigationEventSubscription;
-    private subsWillBlur?: NavigationEventSubscription;
+    private subsDidFocus?: any;
+    private subsWillBlur?: any;
     constructor(props: IProps) {
       super(props);
       YellowBox.ignoreWarnings(['Calling `getNode()` on the ref of an Animated']);
@@ -33,24 +35,30 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       };
     }
 
-    static navigationOptions = ({
-      navigation,
-    }: {
-      navigation: NavigationScreenProp<NavigationRoute<NavigationParams>, NavigationParams>;
-    }) => {
+    static lastTitle = '';
+
+    static getParam(route: any, key: string, defaultValue: any) {
+      if (!route || !route.params || !route.params[key]) {
+        return defaultValue;
+      }
+      return route.params[key];
+    }
+
+    static navigationOptions = ({ route }: { route: any }) => {
       const options: any = {};
-      const title = navigation.getParam('_tabBarTitle', '');
-      const headerTintColor = navigation.getParam('_headerTintColor', undefined);
+      const title = WrappedScreen.getParam(route, '_tabBarTitle', WrappedScreen.lastTitle);
+      WrappedScreen.lastTitle = title;
+      const headerTintColor = WrappedScreen.getParam(route, '_headerTintColor', undefined);
       if (headerTintColor) {
         options.headerTintColor = headerTintColor;
       }
-      const backgroundColor = navigation.getParam('_headerBackgroundColor', undefined);
+      const backgroundColor = WrappedScreen.getParam(route, '_headerBackgroundColor', undefined);
       if (backgroundColor) {
         options.headerStyle = {
           backgroundColor,
         };
       }
-      const isNavigationBarLoadingShow = navigation.getParam('_isNavigationBarLoadingShow', false);
+      const isNavigationBarLoadingShow = WrappedScreen.getParam(route, '_isNavigationBarLoadingShow', false);
       options.headerTitle = () => (
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {isNavigationBarLoadingShow && <LoadingView tintColor={headerTintColor} />}
@@ -72,18 +80,34 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
 
     UNSAFE_componentWillMount() {
       this.initBinding();
-      this.subsDidFocus = this.props.navigation.addListener('didFocus', payload => {
+      this.subsDidFocus = this.props.navigation.addListener('focus', () => {
         this.initBinding();
         this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
       });
-      this.subsWillBlur = this.props.navigation.addListener('willBlur', payload => {
+      this.subsWillBlur = this.props.navigation.addListener('blur', () => {
         this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
       });
+      // 4.x
+      // this.subsDidFocus = this.props.navigation.addListener('didFocus', payload => {
+      //   this.initBinding();
+      //   this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
+      // });
+      // this.subsWillBlur = this.props.navigation.addListener('willBlur', payload => {
+      //   this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
+      // });
+    }
+
+    componentDidMount() {
+      TaroNavigator.bind(Taro, this.props.route.name);
     }
 
     componentWillUnmount() {
-      this.subsDidFocus && this.subsDidFocus.remove();
-      this.subsWillBlur && this.subsWillBlur.remove();
+      // 5.x
+      this.subsDidFocus && this.subsDidFocus();
+      this.subsWillBlur && this.subsWillBlur();
+      // 4.x
+      // this.subsDidFocus && this.subsDidFocus.remove();
+      // this.subsWillBlur && this.subsWillBlur.remove();
     }
 
     /**
@@ -106,7 +130,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       Taro.showNavigationBarLoading = this.showNavigationBarLoading.bind(this);
       Taro.hideNavigationBarLoading = this.hideNavigationBarLoading.bind(this);
       // 滚动
-      // 不支持RN Taro.pageScrollTo = this.pageScrollTo.bind(this);
+      // Taro.pageScrollTo = this.pageScrollTo.bind(this);
       // 下拉刷新
       Taro.startPullDownRefresh = this.startPullDownRefresh.bind(this); // 原Taro有bug
       Taro.stopPullDownRefresh = this.stopPullDownRefresh.bind(this);
@@ -313,12 +337,10 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     }
 
     private showTabBar(option?: NavigatorTabBarOption) {
-      const { animation = false, success, fail, complete } = option || {};
+      const { success, fail, complete } = option || {};
       try {
-        this.props.navigation.setParams({
-          _tabBarVisible: true,
-          _animation: animation,
-        });
+        _globalTabBarVisibleConfig._tabBarVisible = true;
+        this.props.navigation.setParams(_globalTabBarVisibleConfig);
       } catch (error) {
         return errorHandler(error, fail, complete);
       }
@@ -326,12 +348,10 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     }
 
     private hideTabBar(option?: NavigatorTabBarOption) {
-      const { animation = false, success, fail, complete } = option || {};
+      const { success, fail, complete } = option || {};
       try {
-        this.props.navigation.setParams({
-          _tabBarVisible: false,
-          _animation: animation,
-        });
+        _globalTabBarVisibleConfig._tabBarVisible = false;
+        this.props.navigation.setParams(_globalTabBarVisibleConfig);
       } catch (error) {
         return errorHandler(error, fail, complete);
       }

@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const _globalTabBarVisibleConfig = {};
+exports._globalTabBarVisibleConfig = _globalTabBarVisibleConfig;
 /**
  * 全局的Badge配置
  */
