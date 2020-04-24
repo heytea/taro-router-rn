@@ -15,7 +15,7 @@
     "test": "jest"
   },
   "repository": {
-    "type": "git",
+    "type": "git", 
     "url": "git+https://github.com/NervJS/taro.git"
   },
   "keywords": [
