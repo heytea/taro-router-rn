@@ -2,7 +2,7 @@ function upperCaseFirstLetter(string: string) {
   if (typeof string !== 'string') {
     return string;
   }
-  string = string.replace(/^./, match => match.toUpperCase());
+  string = string.replace(/^./, (match) => match.toUpperCase());
   return string;
 }
 
@@ -86,6 +86,7 @@ export const HEADER_CONFIG_MAP: KV = {
   disableScroll: 'disableScroll', // 设置为 true 则页面整体不能上下滚动；只在页面配置中有效，无法在 app.json 中设置该项
   backgroundColor: 'backgroundColor', // 容器背景颜色
   stackNavigatorOptions: 'stackNavigatorOptions', // 支持直接透传createStackNavigator方法的配置
+  rn: 'rn', // react native 的独立属性
 };
 
 export function getNavigationOption(config: KV) {
@@ -93,7 +94,7 @@ export function getNavigationOption(config: KV) {
   if (typeof config !== 'object') {
     return navigationOption;
   }
-  Object.keys(config).forEach(key => {
+  Object.keys(config).forEach((key) => {
     if (HEADER_CONFIG_MAP[key]) {
       navigationOption[HEADER_CONFIG_MAP[key]] = config[key];
     }

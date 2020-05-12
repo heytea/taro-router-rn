@@ -39,6 +39,11 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       navigation: NavigationScreenProp<NavigationRoute<NavigationParams>, NavigationParams>;
     }) => {
       const options: any = {};
+      const navigationOptions = getNavigationOption(Screen.config);
+      if (navigationOptions.navigationStyle === 'custom') {
+        options.header = <View />;
+        return options;
+      }
       const title = navigation.getParam('_tabBarTitle', '');
       const headerTintColor = navigation.getParam('_headerTintColor', undefined);
       if (headerTintColor) {
@@ -52,7 +57,11 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       }
       const isNavigationBarLoadingShow = navigation.getParam('_isNavigationBarLoadingShow', false);
       options.headerTitle = () => (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
           {isNavigationBarLoadingShow && <LoadingView tintColor={headerTintColor} />}
           <Text
             style={{
@@ -72,11 +81,11 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
 
     UNSAFE_componentWillMount() {
       this.initBinding();
-      this.subsDidFocus = this.props.navigation.addListener('didFocus', payload => {
+      this.subsDidFocus = this.props.navigation.addListener('didFocus', () => {
         this.initBinding();
         this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
       });
-      this.subsWillBlur = this.props.navigation.addListener('willBlur', payload => {
+      this.subsWillBlur = this.props.navigation.addListener('willBlur', () => {
         this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
       });
     }
@@ -362,9 +371,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
             refreshControl={
               isScreenEnablePullDownRefresh ? (
                 <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handlePullRefresh} />
-              ) : (
-                undefined
-              )
+              ) : undefined
             }>
             <Screen ref={this.screenRef} {...this.props} />
           </ScrollView>

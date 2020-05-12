@@ -26,11 +26,11 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
         }
         UNSAFE_componentWillMount() {
             this.initBinding();
-            this.subsDidFocus = this.props.navigation.addListener('didFocus', payload => {
+            this.subsDidFocus = this.props.navigation.addListener('didFocus', () => {
                 this.initBinding();
                 this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
             });
-            this.subsWillBlur = this.props.navigation.addListener('willBlur', payload => {
+            this.subsWillBlur = this.props.navigation.addListener('willBlur', () => {
                 this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
             });
         }
@@ -295,12 +295,17 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             let isScreenEnablePullDownRefresh = enablePullDownRefresh === undefined ? globalNavigationOptions.enablePullDownRefresh : enablePullDownRefresh;
             return disableScroll ? (react_1.default.createElement(react_native_safe_area_context_1.SafeAreaView, { style: { height: '100%', width: '100%' } },
                 react_1.default.createElement(Screen, Object.assign({}, this.props)))) : (react_1.default.createElement(react_native_safe_area_context_1.SafeAreaView, { style: { height: '100%', width: '100%' } },
-                react_1.default.createElement(react_native_1.ScrollView, { style: { flex: 1 }, contentContainerStyle: { minHeight: '100%' }, alwaysBounceVertical: true, scrollEventThrottle: 5, refreshControl: isScreenEnablePullDownRefresh ? (react_1.default.createElement(react_native_1.RefreshControl, { refreshing: this.state.refreshing, onRefresh: this.handlePullRefresh })) : (undefined) },
+                react_1.default.createElement(react_native_1.ScrollView, { style: { flex: 1 }, contentContainerStyle: { minHeight: '100%' }, alwaysBounceVertical: true, scrollEventThrottle: 5, refreshControl: isScreenEnablePullDownRefresh ? (react_1.default.createElement(react_native_1.RefreshControl, { refreshing: this.state.refreshing, onRefresh: this.handlePullRefresh })) : undefined },
                     react_1.default.createElement(Screen, Object.assign({ ref: this.screenRef }, this.props)))));
         }
     }
     WrappedScreen.navigationOptions = ({ navigation, }) => {
         const options = {};
+        const navigationOptions = initRouter_1.getNavigationOption(Screen.config);
+        if (navigationOptions.navigationStyle === 'custom') {
+            options.header = react_1.default.createElement(react_native_1.View, null);
+            return options;
+        }
         const title = navigation.getParam('_tabBarTitle', '');
         const headerTintColor = navigation.getParam('_headerTintColor', undefined);
         if (headerTintColor) {
@@ -313,7 +318,10 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             };
         }
         const isNavigationBarLoadingShow = navigation.getParam('_isNavigationBarLoadingShow', false);
-        options.headerTitle = () => (react_1.default.createElement(react_native_1.View, { style: { flexDirection: 'row', alignItems: 'center' } },
+        options.headerTitle = () => (react_1.default.createElement(react_native_1.View, { style: {
+                flexDirection: 'row',
+                alignItems: 'center',
+            } },
             isNavigationBarLoadingShow && react_1.default.createElement(LoadingView_1.default, { tintColor: headerTintColor }),
             react_1.default.createElement(react_native_1.Text, { style: {
                     flexDirection: 'row',

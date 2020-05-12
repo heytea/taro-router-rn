@@ -18,11 +18,11 @@ const config_1 = require("./config");
 function getTabBarRouterConfig(pageList, tabBar, navigationOptions, Taro) {
     const routerConfig = {};
     const tabBarRouterNames = tabBar.list.reduce((acc, cur) => acc + ' ' + cur.pagePath, '');
-    tabBar.list.forEach(item => {
+    tabBar.list.forEach((item) => {
         const currentTabPagePath = item.pagePath;
-        const currentTabBar = pageList.find(pageItem => pageItem[0] === currentTabPagePath); // 找到该tabBar对应在pageList中的一项
+        const currentTabBar = pageList.find((pageItem) => pageItem[0] === currentTabPagePath); // 找到该tabBar对应在pageList中的一项
         if (currentTabBar) {
-            const childStackList = pageList.filter(pathItem => tabBarRouterNames.indexOf(pathItem[0]) < 0); // 将不存在于tabBar.list里的page作为子stack page
+            const childStackList = pageList.filter((pathItem) => tabBarRouterNames.indexOf(pathItem[0]) < 0); // 将不存在于tabBar.list里的page作为子stack page
             let stackPageList = [];
             stackPageList.push(currentTabBar);
             stackPageList = stackPageList.concat(childStackList);
@@ -34,10 +34,13 @@ function getTabBarRouterConfig(pageList, tabBar, navigationOptions, Taro) {
 // 获取Stack类型路由配置
 function getStackRouterConfig(pageList, navigationOptions, Taro) {
     const routerConfig = {};
-    pageList.forEach(item => {
+    pageList.forEach((item) => {
         const key = item[0];
         const screen = item[1];
-        routerConfig[key] = getWrappedScreen_1.default(screen, navigationOptions, Taro);
+        const wrappedScreen = getWrappedScreen_1.default(screen, navigationOptions, Taro);
+        routerConfig[key] = {
+            screen: wrappedScreen,
+        };
     });
     return routerConfig;
 }
@@ -56,8 +59,8 @@ function getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro) {
         defaultNavigationOptions: ({ navigation }) => ({
             tabBarIcon: ({ focused }) => {
                 const { routeName } = navigation.state;
-                const tabBarListItem = tabBar.list.find(item => item.pagePath === routeName);
-                const tabBarIndex = tabBar.list.findIndex(item => item.pagePath === routeName);
+                const tabBarListItem = tabBar.list.find((item) => item.pagePath === routeName);
+                const tabBarIndex = tabBar.list.findIndex((item) => item.pagePath === routeName);
                 return (react_1.default.createElement(HomeIconWithBadge_1.default, { index: tabBarIndex, focused: focused, icon: tabBarListItem && tabBarListItem.iconPath, selectedIcon: tabBarListItem && tabBarListItem.selectedIconPath, text: tabBarListItem && tabBarListItem.text, color: config_1._globalTabBarStyleConfig._tabColor ? config_1._globalTabBarStyleConfig._tabColor : tabBar.color, selectedColor: config_1._globalTabBarStyleConfig._tabSelectedColor
                         ? config_1._globalTabBarStyleConfig._tabSelectedColor
                         : tabBar.selectedColor }));
@@ -69,7 +72,7 @@ function getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro) {
             activeTintColor: tabBar.selectedColor || '#3cc51f',
             inactiveTintColor: tabBar.color || '#7A7E83',
         },
-        tabBarComponent: props => {
+        tabBarComponent: (props) => {
             let bgColor = tabBar.backgroundColor || '#ffffff';
             if (config_1._globalTabBarStyleConfig._tabBackgroundColor) {
                 bgColor = config_1._globalTabBarStyleConfig._tabBackgroundColor;
@@ -86,15 +89,15 @@ function getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro) {
 }
 function getStackNavigator(pageList, navigationOptions, Taro) {
     const routerConfig = getStackRouterConfig(pageList, navigationOptions, Taro);
+    console.log('routerConfig', routerConfig);
     return react_navigation_stack_1.createStackNavigator(routerConfig, {
-        headerMode: 'screen',
+    // headerMode: navigationOptions.rn ? 'none' : 'screen',
     });
 }
 function createRouter(pageList, appConfig, Taro) {
     const { window } = appConfig;
     const tabBar = appConfig.tabBar;
     const navigationOptions = utils_1.getNavigationOption(window);
-    console.log('navigationOptions', navigationOptions);
     if (tabBar && tabBar.list && Array.isArray(tabBar.list) && tabBar.list.length > 0) {
         return react_navigation_1.createAppContainer(getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro));
     }
@@ -116,7 +119,7 @@ function getActiveRouteName(navigationState) {
 }
 const initRouter = (pageList, Taro, appConfig) => {
     const AppContainer = createRouter(pageList, appConfig, Taro);
-    const element = (react_1.default.createElement(AppContainer, { ref: navigatorRef => {
+    const element = (react_1.default.createElement(AppContainer, { ref: (navigatorRef) => {
             NavigationService_1.default.setTopLevelNavigator(navigatorRef);
             // 绑定Taro的路由跳转方法
             TaroNavigator_1.default.bind(Taro);

@@ -77,7 +77,7 @@ export default class TaroNavigator {
   static wxGetCurrentPages() {
     const routes = NavigationService.getRoutes();
     if (routes.length > 0) {
-      return routes.map(item => {
+      return routes.map((item) => {
         return { route: item.routeName };
       });
     }

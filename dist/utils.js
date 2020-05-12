@@ -4,7 +4,7 @@ function upperCaseFirstLetter(string) {
     if (typeof string !== 'string') {
         return string;
     }
-    string = string.replace(/^./, match => match.toUpperCase());
+    string = string.replace(/^./, (match) => match.toUpperCase());
     return string;
 }
 function getParameterError({ name = '', para, correct, wrong, }) {
@@ -71,13 +71,14 @@ exports.HEADER_CONFIG_MAP = {
     disableScroll: 'disableScroll',
     backgroundColor: 'backgroundColor',
     stackNavigatorOptions: 'stackNavigatorOptions',
+    rn: 'rn',
 };
 function getNavigationOption(config) {
     let navigationOption = {};
     if (typeof config !== 'object') {
         return navigationOption;
     }
-    Object.keys(config).forEach(key => {
+    Object.keys(config).forEach((key) => {
         if (exports.HEADER_CONFIG_MAP[key]) {
             navigationOption[exports.HEADER_CONFIG_MAP[key]] = config[key];
         }

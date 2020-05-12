@@ -13,11 +13,11 @@ import { _globalTabBarStyleConfig } from './config';
 function getTabBarRouterConfig(pageList: PageList, tabBar: TabBar, navigationOptions: KV, Taro: Taro) {
   const routerConfig: KV = {};
   const tabBarRouterNames = tabBar.list.reduce((acc, cur) => acc + ' ' + cur.pagePath, '');
-  tabBar.list.forEach(item => {
+  tabBar.list.forEach((item) => {
     const currentTabPagePath = item.pagePath;
-    const currentTabBar = pageList.find(pageItem => pageItem[0] === currentTabPagePath); // 找到该tabBar对应在pageList中的一项
+    const currentTabBar = pageList.find((pageItem) => pageItem[0] === currentTabPagePath); // 找到该tabBar对应在pageList中的一项
     if (currentTabBar) {
-      const childStackList = pageList.filter(pathItem => tabBarRouterNames.indexOf(pathItem[0]) < 0); // 将不存在于tabBar.list里的page作为子stack page
+      const childStackList = pageList.filter((pathItem) => tabBarRouterNames.indexOf(pathItem[0]) < 0); // 将不存在于tabBar.list里的page作为子stack page
       let stackPageList: PageList = [];
       stackPageList.push(currentTabBar);
       stackPageList = stackPageList.concat(childStackList);
@@ -30,10 +30,14 @@ function getTabBarRouterConfig(pageList: PageList, tabBar: TabBar, navigationOpt
 // 获取Stack类型路由配置
 function getStackRouterConfig(pageList: PageList, navigationOptions: KV, Taro: Taro) {
   const routerConfig: KV = {};
-  pageList.forEach(item => {
+  pageList.forEach((item) => {
     const key = item[0];
     const screen = item[1];
-    routerConfig[key] = getWrappedScreen(screen, navigationOptions, Taro);
+
+    const wrappedScreen = getWrappedScreen(screen, navigationOptions, Taro);
+    routerConfig[key] = {
+      screen: wrappedScreen,
+    };
   });
   return routerConfig;
 }
@@ -54,8 +58,8 @@ function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOpt
     defaultNavigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ focused }) => {
         const { routeName } = navigation.state;
-        const tabBarListItem = tabBar.list.find(item => item.pagePath === routeName);
-        const tabBarIndex = tabBar.list.findIndex(item => item.pagePath === routeName);
+        const tabBarListItem = tabBar.list.find((item) => item.pagePath === routeName);
+        const tabBarIndex = tabBar.list.findIndex((item) => item.pagePath === routeName);
 
         return (
           <HomeIconWithBadge
@@ -80,7 +84,7 @@ function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOpt
       activeTintColor: tabBar.selectedColor || '#3cc51f',
       inactiveTintColor: tabBar.color || '#7A7E83',
     },
-    tabBarComponent: props => {
+    tabBarComponent: (props) => {
       let bgColor = tabBar.backgroundColor || '#ffffff';
       if (_globalTabBarStyleConfig._tabBackgroundColor) {
         bgColor = _globalTabBarStyleConfig._tabBackgroundColor;
@@ -104,8 +108,9 @@ function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOpt
 
 function getStackNavigator(pageList: PageList, navigationOptions: KV, Taro: Taro) {
   const routerConfig = getStackRouterConfig(pageList, navigationOptions, Taro);
+  console.log('routerConfig', routerConfig);
   return createStackNavigator(routerConfig, {
-    headerMode: 'screen',
+    // headerMode: navigationOptions.rn ? 'none' : 'screen',
   });
 }
 
@@ -113,7 +118,6 @@ function createRouter(pageList: PageList, appConfig: any, Taro: Taro) {
   const { window } = appConfig;
   const tabBar: TabBar = appConfig.tabBar;
   const navigationOptions = getNavigationOption(window);
-  console.log('navigationOptions', navigationOptions);
   if (tabBar && tabBar.list && Array.isArray(tabBar.list) && tabBar.list.length > 0) {
     return createAppContainer(getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro));
   } else {
@@ -138,7 +142,7 @@ const initRouter = (pageList: PageList, Taro: Taro, appConfig: any) => {
   const AppContainer = createRouter(pageList, appConfig, Taro);
   const element = (
     <AppContainer
-      ref={navigatorRef => {
+      ref={(navigatorRef) => {
         NavigationService.setTopLevelNavigator(navigatorRef);
         // 绑定Taro的路由跳转方法
         TaroNavigator.bind(Taro);
