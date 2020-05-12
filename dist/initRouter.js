@@ -89,9 +89,8 @@ function getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro) {
 }
 function getStackNavigator(pageList, navigationOptions, Taro) {
     const routerConfig = getStackRouterConfig(pageList, navigationOptions, Taro);
-    console.log('routerConfig', routerConfig);
     return react_navigation_stack_1.createStackNavigator(routerConfig, {
-    // headerMode: navigationOptions.rn ? 'none' : 'screen',
+        headerMode: navigationOptions.navigationStyle === 'custom' ? 'none' : 'screen',
     });
 }
 function createRouter(pageList, appConfig, Taro) {

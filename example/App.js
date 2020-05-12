@@ -26,6 +26,7 @@ const config = {
     navigationBarTitleText: '',
     navigationBarTextStyle: 'black',
     enablePullDownRefresh: true,
+    // navigationStyle: 'custom',
     rn: {
       // 以下属性，Taro官方不存在，喜茶自定义
       statusBar: {

@@ -303,7 +303,7 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
         const options = {};
         const navigationOptions = initRouter_1.getNavigationOption(Screen.config);
         if (navigationOptions.navigationStyle === 'custom') {
-            options.header = react_1.default.createElement(react_native_1.View, null);
+            options.header = () => react_1.default.createElement(react_native_1.View, null);
             return options;
         }
         const title = navigation.getParam('_tabBarTitle', '');

@@ -41,7 +41,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       const options: any = {};
       const navigationOptions = getNavigationOption(Screen.config);
       if (navigationOptions.navigationStyle === 'custom') {
-        options.header = <View />;
+        options.header = () => <View />;
         return options;
       }
       const title = navigation.getParam('_tabBarTitle', '');
