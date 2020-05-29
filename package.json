@@ -1,6 +1,6 @@
 {
   "name": "@heytea/taro-router-rn",
-  "version": "2.0.7",
+  "version": "0.4.0",
   "description": "taro-router-rn",
   "main": "./index.js",
   "files": [
@@ -16,12 +16,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NervJS/taro.git"
+    "url": "git+https://github.com/heytea/taro-router-rn"
   },
   "keywords": [
     "router"
   ],
-  "author": "O2Team",
+  "author": "HeyteaTeam",
   "license": "MIT",
   "dependencies": {
     "@react-native-community/masked-view": "^0.1.7",
