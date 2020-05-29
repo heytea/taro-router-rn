@@ -6,7 +6,29 @@ export interface IProps {}
 
 export default class HomeScreen extends React.Component<IProps> {
   static config = {
-    navigationStyle: 'custom',
+    // navigationStyle: 'custom',
+    rn: {
+      statusBar: {
+        backgroundColor: 'white',
+      },
+      navigationBarMenus: [
+        {
+          text: '按钮1',
+          color: '#9e9e9e',
+          click: () => {
+            console.log('按钮1');
+          },
+        },
+        {
+          icon: 'http://static.heytea.com/taro_trial/v1/img/bar/home-icon-normal.png',
+          text: '按钮2',
+          color: '#9e9e9e',
+          click: () => {
+            console.log('按钮2');
+          },
+        },
+      ],
+    },
   };
 
   private visible: boolean;
@@ -19,10 +41,11 @@ export default class HomeScreen extends React.Component<IProps> {
       title: navigation.getParam('showBar', false),
     };
   };
-  componentDidMount() {}
+  componentDidMount() {
+    Taro.setNavigationBarTitle({ title: '自定义标题' });
+  }
   componentDidShow() {
     console.log('componentDidShow');
-    Taro.setNavigationBarTitle({ title: '首页' });
   }
   componentDidHide() {
     console.log('componentDidHide');

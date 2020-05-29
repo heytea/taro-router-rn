@@ -101,3 +101,57 @@ export function getNavigationOption(config: KV) {
   });
   return navigationOption;
 }
+
+export function getRnNavigationOption(screenRnConfig?: KV, globalRnConfig?: KV) {
+  let config = screenRnConfig ? screenRnConfig : globalRnConfig;
+
+  if (!config) {
+    return undefined;
+    // config = { statusBar: {}, navigationBarTitleStyle: {}, navigationBarBottomStyle: {}, navigationBarMenus: [] };
+  } else {
+    config.statusBar = config.statusBar ? config.statusBar : {};
+    config.navigationBarTitleStyle = config.navigationBarTitleStyle ? config.navigationBarTitleStyle : {};
+    config.navigationBarBottomStyle = config.navigationBarBottomStyle ? config.navigationBarBottomStyle : {};
+    // config.navigationBarMenus = config.navigationBarMenus ? config.navigationBarMenus : [];
+  }
+
+  const rn = {
+    // 以下属性，Taro官方不存在，喜茶自定义
+    statusBar: {
+      backgroundColor: config.statusBar.backgroundColor ? config.statusBar.backgroundColor : '#fff',
+      barStyle: config.statusBar.barStyle ? config.statusBar.barStyle : 'dark-content',
+      translucent: config.statusBar.translucent,
+    }, // 手机状态栏
+    navigationBarTitleStyle: {
+      color: config.navigationBarTitleStyle.color ? config.navigationBarTitleStyle.color : '#343434',
+      fontSize: config.navigationBarTitleStyle.fontSize ? config.navigationBarTitleStyle.fontSize : 19,
+      fontFamily: config.navigationBarTitleStyle.fontFamily ? config.navigationBarTitleStyle.fontFamily : undefined,
+      fontWeight: config.navigationBarTitleStyle.fontWeight ? config.navigationBarTitleStyle.fontWeight : '400',
+    },
+    navigationBarHeight: config.navigationBarHeight ? config.navigationBarHeight : 44, // 导航栏高度
+    navigationBarShadow: config.navigationBarShadow ? config.navigationBarShadow : false, // 导航栏是否有阴影
+    navigationBarBottomStyle: {
+      height: config.navigationBarBottomStyle.height ? config.navigationBarBottomStyle.height : 1,
+      width: config.navigationBarBottomStyle.width ? config.navigationBarBottomStyle.width : '100%',
+      backgroundColor: config.navigationBarBottomStyle.backgroundColor
+        ? config.navigationBarBottomStyle.backgroundColor
+        : '#ccc',
+    }, // 导航栏底部线样式, object | undefined
+    navigationBarBackgroundColor: config.navigationBarBackgroundColor ? config.navigationBarBackgroundColor : '#fff',
+    navigationBarTitlePosition: config.navigationBarTitlePosition ? config.navigationBarTitlePosition : 'center', // 导航栏标题位置，'left', 'center'
+    navigationBarBackIcon: config.navigationBarBackIcon
+      ? config.navigationBarBackIcon
+      : require('./img/arrow_back.png'), // 导航栏返回按钮图标
+    navigationBarMenus: config.navigationBarMenus
+      ? config.navigationBarMenus
+      : [
+          {
+            icon: undefined, // 图片路径 | undefined
+            text: '', // 文字 | undefined
+            color: '#343434', // 文字颜色
+            click: () => {}, // 点击回调
+          },
+        ], // 导航栏菜单按钮
+  };
+  return rn;
+}

@@ -1,7 +1,7 @@
 import React from 'react';
-import { ScrollView, YellowBox, View, Text, RefreshControl } from 'react-native';
+import { YellowBox, View, Text, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { NavigationScreenProp, NavigationRoute, NavigationParams, NavigationEventSubscription } from 'react-navigation';
-import { errorHandler, successHandler } from './utils';
+import { errorHandler, successHandler, getRnNavigationOption } from './utils';
 import LoadingView from './LoadingView';
 import { getNavigationOption } from './initRouter';
 import {
@@ -12,6 +12,7 @@ import {
   _globalTabBarItemConfig,
 } from './config';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import NavigationService from './NavigationService';
 
 function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: Taro) {
   interface IProps {
@@ -20,6 +21,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
   interface IState {
     refreshing: boolean;
   }
+  let screenTitle = '';
   class WrappedScreen extends React.Component<IProps, IState> {
     private screenRef: React.RefObject<any>;
     private subsDidFocus?: NavigationEventSubscription;
@@ -38,13 +40,14 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     }: {
       navigation: NavigationScreenProp<NavigationRoute<NavigationParams>, NavigationParams>;
     }) => {
+      const title = navigation.getParam('_tabBarTitle', '');
+      screenTitle = title;
       const options: any = {};
       const navigationOptions = getNavigationOption(Screen.config);
-      if (navigationOptions.navigationStyle === 'custom') {
+      if (navigationOptions.navigationStyle === 'custom' || navigationOptions.rn) {
         options.header = () => <View />;
         return options;
       }
-      const title = navigation.getParam('_tabBarTitle', '');
       const headerTintColor = navigation.getParam('_headerTintColor', undefined);
       if (headerTintColor) {
         options.headerTintColor = headerTintColor;
@@ -352,31 +355,144 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       this.getScreenInstance().onPullDownRefresh && this.getScreenInstance().onPullDownRefresh();
     };
 
+    private handleBackPress = () => {
+      NavigationService.goBack();
+    };
+
     render() {
-      const { enablePullDownRefresh, disableScroll } = getNavigationOption(Screen.config);
-      // 页面配置优先级 > 全局配置
-      let isScreenEnablePullDownRefresh =
-        enablePullDownRefresh === undefined ? globalNavigationOptions.enablePullDownRefresh : enablePullDownRefresh;
-      return disableScroll ? (
+      const screenNavigationOptions = getNavigationOption(Screen.config);
+      const rnConfig = getRnNavigationOption(screenNavigationOptions.rn, globalNavigationOptions.rn);
+      console.log('rnConfig', rnConfig);
+      // TODO: iOS 刘海屏状态栏背景色问题
+      // const safeAreaViewBgColor = rnConfig ? rnConfig.statusBar.backgroundColor : '#fff';
+      return (
         <SafeAreaView style={{ height: '100%', width: '100%' }}>
+          {rnConfig && (
+            <StatusBar backgroundColor={rnConfig.statusBar.backgroundColor} barStyle={rnConfig.statusBar.barStyle} />
+          )}
+          {rnConfig && (
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                position: 'relative',
+                height: rnConfig.navigationBarHeight,
+                backgroundColor: rnConfig.navigationBarBackgroundColor,
+              }}>
+              {/* 标题 */}
+              <View
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: rnConfig.navigationBarTitlePosition === 'left' ? 'flex-start' : 'center',
+                  justifyContent: 'center',
+                  padding: 48,
+                }}>
+                <Text
+                  style={{
+                    color: rnConfig.navigationBarTitleStyle.color,
+                    fontSize: rnConfig.navigationBarTitleStyle.fontSize,
+                    fontFamily: rnConfig.navigationBarTitleStyle.fontFamily,
+                    fontWeight: rnConfig.navigationBarTitleStyle.fontWeight,
+                    height: rnConfig.navigationBarTitleStyle.fontSize,
+                    includeFontPadding: false,
+                  }}>
+                  {screenTitle}
+                </Text>
+              </View>
+              {/* 返回键 */}
+              <TouchableOpacity onPress={this.handleBackPress}>
+                <Image
+                  style={{ height: 30, width: 30, marginStart: 8 }}
+                  source={
+                    typeof rnConfig.navigationBarBackIcon === 'string'
+                      ? { uri: rnConfig.navigationBarBackIcon }
+                      : rnConfig.navigationBarBackIcon
+                  }
+                />
+              </TouchableOpacity>
+              {/* 菜单键 */}
+              <View
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                {rnConfig.navigationBarMenus.map((item: any, index: number) => {
+                  return (
+                    <TouchableOpacity
+                      key={`navigation-bar-menus-${index}`}
+                      onPress={() => {
+                        item.click && item.click();
+                      }}>
+                      {item.icon ? (
+                        <Image
+                          style={{ height: 30, width: 30, marginEnd: 16 }}
+                          source={typeof item.icon === 'string' ? { uri: item.icon } : item.icon}
+                        />
+                      ) : (
+                        <Text style={{ marginEnd: 16, color: item.color ? item.color : '#343434', fontSize: 16 }}>
+                          {item.text}
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          )}
+          {rnConfig && (
+            <View
+              style={{
+                height: rnConfig.navigationBarBottomStyle.height,
+                width: rnConfig.navigationBarBottomStyle.width,
+                backgroundColor: rnConfig.navigationBarBottomStyle.backgroundColor,
+              }}
+            />
+          )}
+          {rnConfig && rnConfig.navigationBarShadow && (
+            <View
+              style={{
+                width: '100%',
+                height: 0.5,
+                backgroundColor: '#aaa',
+                elevation: 2,
+              }}
+            />
+          )}
           <Screen {...this.props} />
         </SafeAreaView>
-      ) : (
-        <SafeAreaView style={{ height: '100%', width: '100%' }}>
-          <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ minHeight: '100%' }}
-            alwaysBounceVertical
-            scrollEventThrottle={5}
-            refreshControl={
-              isScreenEnablePullDownRefresh ? (
-                <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handlePullRefresh} />
-              ) : undefined
-            }>
-            <Screen ref={this.screenRef} {...this.props} />
-          </ScrollView>
-        </SafeAreaView>
       );
+      // TODO: 不再支持PullDownRefresh，因为使用ScrollView可能会导致子容器高度发生变化
+      // 页面配置优先级 > 全局配置
+      // let isScreenEnablePullDownRefresh =
+      //   enablePullDownRefresh === undefined ? globalNavigationOptions.enablePullDownRefresh : enablePullDownRefresh;
+      // return disableScroll ? (
+      //   <SafeAreaView style={{ height: '100%', width: '100%' }}>
+      //     <Screen {...this.props} />
+      //   </SafeAreaView>
+      // ) : (
+      //   <SafeAreaView style={{ height: '100%', width: '100%' }}>
+      //     <ScrollView
+      //       style={{ flex: 1 }}
+      //       contentContainerStyle={{ minHeight: '100%' }}
+      //       alwaysBounceVertical
+      //       scrollEventThrottle={5}
+      //       refreshControl={
+      //         isScreenEnablePullDownRefresh ? (
+      //           <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handlePullRefresh} />
+      //         ) : undefined
+      //       }>
+      //       <Screen ref={this.screenRef} {...this.props} />
+      //     </ScrollView>
+      //   </SafeAreaView>
+      // );
     }
   }
   return WrappedScreen;

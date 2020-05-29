@@ -109,7 +109,7 @@ function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOpt
 function getStackNavigator(pageList: PageList, navigationOptions: KV, Taro: Taro) {
   const routerConfig = getStackRouterConfig(pageList, navigationOptions, Taro);
   return createStackNavigator(routerConfig, {
-    headerMode: navigationOptions.navigationStyle === 'custom' ? 'none' : 'screen',
+    headerMode: navigationOptions.navigationStyle === 'custom' || navigationOptions.rn ? 'none' : 'screen',
   });
 }
 

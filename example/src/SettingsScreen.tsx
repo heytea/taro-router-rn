@@ -3,8 +3,16 @@ import { View, Button } from 'react-native';
 import Taro from './taro/Taro';
 
 export default class SettingsScreen extends React.Component {
+  static config = {
+    // rn: {
+    //   statusBar: {
+    //     backgroundColor: 'blue',
+    //     barStyle: 'light-content',
+    //   },
+    // },
+  };
   componentDidMount() {
-    Taro.setNavigationBarTitle({ title: '订单' });
+    Taro.setNavigationBarTitle({ title: '设置' });
   }
   render() {
     return (

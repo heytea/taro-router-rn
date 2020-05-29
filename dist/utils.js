@@ -86,3 +86,56 @@ function getNavigationOption(config) {
     return navigationOption;
 }
 exports.getNavigationOption = getNavigationOption;
+function getRnNavigationOption(screenRnConfig, globalRnConfig) {
+    let config = screenRnConfig ? screenRnConfig : globalRnConfig;
+    if (!config) {
+        return undefined;
+        // config = { statusBar: {}, navigationBarTitleStyle: {}, navigationBarBottomStyle: {}, navigationBarMenus: [] };
+    }
+    else {
+        config.statusBar = config.statusBar ? config.statusBar : {};
+        config.navigationBarTitleStyle = config.navigationBarTitleStyle ? config.navigationBarTitleStyle : {};
+        config.navigationBarBottomStyle = config.navigationBarBottomStyle ? config.navigationBarBottomStyle : {};
+        // config.navigationBarMenus = config.navigationBarMenus ? config.navigationBarMenus : [];
+    }
+    const rn = {
+        // 以下属性，Taro官方不存在，喜茶自定义
+        statusBar: {
+            backgroundColor: config.statusBar.backgroundColor ? config.statusBar.backgroundColor : '#fff',
+            barStyle: config.statusBar.barStyle ? config.statusBar.barStyle : 'dark-content',
+            translucent: config.statusBar.translucent,
+        },
+        navigationBarTitleStyle: {
+            color: config.navigationBarTitleStyle.color ? config.navigationBarTitleStyle.color : '#343434',
+            fontSize: config.navigationBarTitleStyle.fontSize ? config.navigationBarTitleStyle.fontSize : 19,
+            fontFamily: config.navigationBarTitleStyle.fontFamily ? config.navigationBarTitleStyle.fontFamily : undefined,
+            fontWeight: config.navigationBarTitleStyle.fontWeight ? config.navigationBarTitleStyle.fontWeight : '400',
+        },
+        navigationBarHeight: config.navigationBarHeight ? config.navigationBarHeight : 44,
+        navigationBarShadow: config.navigationBarShadow ? config.navigationBarShadow : false,
+        navigationBarBottomStyle: {
+            height: config.navigationBarBottomStyle.height ? config.navigationBarBottomStyle.height : 1,
+            width: config.navigationBarBottomStyle.width ? config.navigationBarBottomStyle.width : '100%',
+            backgroundColor: config.navigationBarBottomStyle.backgroundColor
+                ? config.navigationBarBottomStyle.backgroundColor
+                : '#ccc',
+        },
+        navigationBarBackgroundColor: config.navigationBarBackgroundColor ? config.navigationBarBackgroundColor : '#fff',
+        navigationBarTitlePosition: config.navigationBarTitlePosition ? config.navigationBarTitlePosition : 'center',
+        navigationBarBackIcon: config.navigationBarBackIcon
+            ? config.navigationBarBackIcon
+            : require('./img/arrow_back.png'),
+        navigationBarMenus: config.navigationBarMenus
+            ? config.navigationBarMenus
+            : [
+                {
+                    icon: undefined,
+                    text: '',
+                    color: '#343434',
+                    click: () => { },
+                },
+            ],
+    };
+    return rn;
+}
+exports.getRnNavigationOption = getRnNavigationOption;

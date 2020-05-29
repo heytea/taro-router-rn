@@ -26,12 +26,12 @@ const config = {
     navigationBarTitleText: '',
     navigationBarTextStyle: 'black',
     enablePullDownRefresh: true,
-    // navigationStyle: 'custom',
     rn: {
       // 以下属性，Taro官方不存在，喜茶自定义
       statusBar: {
-        backgroundColor: 'blue',
+        backgroundColor: 'red',
         barStyle: 'light-content',
+        translucent: false,
       }, // 手机状态栏
       navigationBarTitleStyle: {
         color: '',
@@ -39,6 +39,7 @@ const config = {
         fontFamily: '',
         fontWeight: '400',
       },
+      navigationBarBackgroundColor: '#fff',
       navigationBarHeight: 50, // 导航栏高度
       navigationBarShadow: false, // 导航栏是否有阴影
       navigationBarBottomStyle: {
@@ -74,7 +75,7 @@ const config = {
         selectedIconPath: assetsImgBarTakeActivePng,
         iconPath: assetsImgBarTakePng,
         pagePath: 'pages/code/code',
-        text: '订单',
+        text: '设置',
       },
     ],
   },

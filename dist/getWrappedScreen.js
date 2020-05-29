@@ -10,13 +10,18 @@ const LoadingView_1 = __importDefault(require("./LoadingView"));
 const initRouter_1 = require("./initRouter");
 const config_1 = require("./config");
 const react_native_safe_area_context_1 = require("react-native-safe-area-context");
+const NavigationService_1 = __importDefault(require("./NavigationService"));
 function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
+    let screenTitle = '';
     class WrappedScreen extends react_1.default.Component {
         constructor(props) {
             super(props);
             this.handlePullRefresh = () => {
                 this.setState({ refreshing: true });
                 this.getScreenInstance().onPullDownRefresh && this.getScreenInstance().onPullDownRefresh();
+            };
+            this.handleBackPress = () => {
+                NavigationService_1.default.goBack();
             };
             react_native_1.YellowBox.ignoreWarnings(['Calling `getNode()` on the ref of an Animated']);
             this.screenRef = react_1.default.createRef();
@@ -290,23 +295,101 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             return utils_1.successHandler(success, complete);
         }
         render() {
-            const { enablePullDownRefresh, disableScroll } = initRouter_1.getNavigationOption(Screen.config);
+            const screenNavigationOptions = initRouter_1.getNavigationOption(Screen.config);
+            const rnConfig = utils_1.getRnNavigationOption(screenNavigationOptions.rn, globalNavigationOptions.rn);
+            console.log('rnConfig', rnConfig);
+            // TODO: iOS 刘海屏状态栏背景色问题
+            // const safeAreaViewBgColor = rnConfig ? rnConfig.statusBar.backgroundColor : '#fff';
+            return (react_1.default.createElement(react_native_safe_area_context_1.SafeAreaView, { style: { height: '100%', width: '100%' } },
+                rnConfig && (react_1.default.createElement(react_native_1.StatusBar, { backgroundColor: rnConfig.statusBar.backgroundColor, barStyle: rnConfig.statusBar.barStyle })),
+                rnConfig && (react_1.default.createElement(react_native_1.View, { style: {
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        position: 'relative',
+                        height: rnConfig.navigationBarHeight,
+                        backgroundColor: rnConfig.navigationBarBackgroundColor,
+                    } },
+                    react_1.default.createElement(react_native_1.View, { style: {
+                            position: 'absolute',
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: rnConfig.navigationBarTitlePosition === 'left' ? 'flex-start' : 'center',
+                            justifyContent: 'center',
+                            padding: 48,
+                        } },
+                        react_1.default.createElement(react_native_1.Text, { style: {
+                                color: rnConfig.navigationBarTitleStyle.color,
+                                fontSize: rnConfig.navigationBarTitleStyle.fontSize,
+                                fontFamily: rnConfig.navigationBarTitleStyle.fontFamily,
+                                fontWeight: rnConfig.navigationBarTitleStyle.fontWeight,
+                                height: rnConfig.navigationBarTitleStyle.fontSize,
+                                includeFontPadding: false,
+                            } }, screenTitle)),
+                    react_1.default.createElement(react_native_1.TouchableOpacity, { onPress: this.handleBackPress },
+                        react_1.default.createElement(react_native_1.Image, { style: { height: 30, width: 30, marginStart: 8 }, source: typeof rnConfig.navigationBarBackIcon === 'string'
+                                ? { uri: rnConfig.navigationBarBackIcon }
+                                : rnConfig.navigationBarBackIcon })),
+                    react_1.default.createElement(react_native_1.View, { style: {
+                            position: 'absolute',
+                            right: 0,
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                        } }, rnConfig.navigationBarMenus.map((item, index) => {
+                        return (react_1.default.createElement(react_native_1.TouchableOpacity, { key: `navigation-bar-menus-${index}`, onPress: () => {
+                                item.click && item.click();
+                            } }, item.icon ? (react_1.default.createElement(react_native_1.Image, { style: { height: 30, width: 30, marginEnd: 16 }, source: typeof item.icon === 'string' ? { uri: item.icon } : item.icon })) : (react_1.default.createElement(react_native_1.Text, { style: { marginEnd: 16, color: item.color ? item.color : '#343434', fontSize: 16 } }, item.text))));
+                    })))),
+                rnConfig && (react_1.default.createElement(react_native_1.View, { style: {
+                        height: rnConfig.navigationBarBottomStyle.height,
+                        width: rnConfig.navigationBarBottomStyle.width,
+                        backgroundColor: rnConfig.navigationBarBottomStyle.backgroundColor,
+                    } })),
+                rnConfig && rnConfig.navigationBarShadow && (react_1.default.createElement(react_native_1.View, { style: {
+                        width: '100%',
+                        height: 0.5,
+                        backgroundColor: '#aaa',
+                        elevation: 2,
+                    } })),
+                react_1.default.createElement(Screen, Object.assign({}, this.props))));
+            // TODO: 不再支持PullDownRefresh，因为使用ScrollView可能会导致子容器高度发生变化
             // 页面配置优先级 > 全局配置
-            let isScreenEnablePullDownRefresh = enablePullDownRefresh === undefined ? globalNavigationOptions.enablePullDownRefresh : enablePullDownRefresh;
-            return disableScroll ? (react_1.default.createElement(react_native_safe_area_context_1.SafeAreaView, { style: { height: '100%', width: '100%' } },
-                react_1.default.createElement(Screen, Object.assign({}, this.props)))) : (react_1.default.createElement(react_native_safe_area_context_1.SafeAreaView, { style: { height: '100%', width: '100%' } },
-                react_1.default.createElement(react_native_1.ScrollView, { style: { flex: 1 }, contentContainerStyle: { minHeight: '100%' }, alwaysBounceVertical: true, scrollEventThrottle: 5, refreshControl: isScreenEnablePullDownRefresh ? (react_1.default.createElement(react_native_1.RefreshControl, { refreshing: this.state.refreshing, onRefresh: this.handlePullRefresh })) : undefined },
-                    react_1.default.createElement(Screen, Object.assign({ ref: this.screenRef }, this.props)))));
+            // let isScreenEnablePullDownRefresh =
+            //   enablePullDownRefresh === undefined ? globalNavigationOptions.enablePullDownRefresh : enablePullDownRefresh;
+            // return disableScroll ? (
+            //   <SafeAreaView style={{ height: '100%', width: '100%' }}>
+            //     <Screen {...this.props} />
+            //   </SafeAreaView>
+            // ) : (
+            //   <SafeAreaView style={{ height: '100%', width: '100%' }}>
+            //     <ScrollView
+            //       style={{ flex: 1 }}
+            //       contentContainerStyle={{ minHeight: '100%' }}
+            //       alwaysBounceVertical
+            //       scrollEventThrottle={5}
+            //       refreshControl={
+            //         isScreenEnablePullDownRefresh ? (
+            //           <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handlePullRefresh} />
+            //         ) : undefined
+            //       }>
+            //       <Screen ref={this.screenRef} {...this.props} />
+            //     </ScrollView>
+            //   </SafeAreaView>
+            // );
         }
     }
     WrappedScreen.navigationOptions = ({ navigation, }) => {
+        const title = navigation.getParam('_tabBarTitle', '');
+        screenTitle = title;
         const options = {};
         const navigationOptions = initRouter_1.getNavigationOption(Screen.config);
-        if (navigationOptions.navigationStyle === 'custom') {
+        if (navigationOptions.navigationStyle === 'custom' || navigationOptions.rn) {
             options.header = () => react_1.default.createElement(react_native_1.View, null);
             return options;
         }
-        const title = navigation.getParam('_tabBarTitle', '');
         const headerTintColor = navigation.getParam('_headerTintColor', undefined);
         if (headerTintColor) {
             options.headerTintColor = headerTintColor;
