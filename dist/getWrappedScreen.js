@@ -3,14 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable react-native/no-inline-styles */
 const react_1 = __importDefault(require("react"));
 const react_native_1 = require("react-native");
+const react_navigation_1 = require("react-navigation");
 const utils_1 = require("./utils");
 const LoadingView_1 = __importDefault(require("./LoadingView"));
 const initRouter_1 = require("./initRouter");
 const config_1 = require("./config");
-const react_native_safe_area_context_1 = require("react-native-safe-area-context");
 const NavigationService_1 = __importDefault(require("./NavigationService"));
+const CustomHeader_1 = __importDefault(require("./CustomHeader"));
 function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
     let screenTitle = '';
     class WrappedScreen extends react_1.default.Component {
@@ -298,63 +300,126 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             const screenNavigationOptions = initRouter_1.getNavigationOption(Screen.config);
             const rnConfig = utils_1.getRnNavigationOption(screenNavigationOptions.rn, globalNavigationOptions.rn);
             console.log('rnConfig', rnConfig);
-            // TODO: iOS 刘海屏状态栏背景色问题
-            // const safeAreaViewBgColor = rnConfig ? rnConfig.statusBar.backgroundColor : '#fff';
-            return (react_1.default.createElement(react_native_safe_area_context_1.SafeAreaView, { style: { height: '100%', width: '100%' } },
-                rnConfig && (react_1.default.createElement(react_native_1.StatusBar, { backgroundColor: rnConfig.statusBar.backgroundColor, barStyle: rnConfig.statusBar.barStyle })),
-                rnConfig && (react_1.default.createElement(react_native_1.View, { style: {
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        position: 'relative',
-                        height: rnConfig.navigationBarHeight,
-                        backgroundColor: rnConfig.navigationBarBackgroundColor,
-                    } },
-                    react_1.default.createElement(react_native_1.View, { style: {
-                            position: 'absolute',
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: rnConfig.navigationBarTitlePosition === 'left' ? 'flex-start' : 'center',
-                            justifyContent: 'center',
-                            padding: 48,
-                        } },
-                        react_1.default.createElement(react_native_1.Text, { style: {
-                                color: rnConfig.navigationBarTitleStyle.color,
-                                fontSize: rnConfig.navigationBarTitleStyle.fontSize,
-                                fontFamily: rnConfig.navigationBarTitleStyle.fontFamily,
-                                fontWeight: rnConfig.navigationBarTitleStyle.fontWeight,
-                                height: rnConfig.navigationBarTitleStyle.fontSize,
-                                includeFontPadding: false,
-                            } }, screenTitle)),
-                    react_1.default.createElement(react_native_1.TouchableOpacity, { onPress: this.handleBackPress },
-                        react_1.default.createElement(react_native_1.Image, { style: { height: 30, width: 30, marginStart: 8 }, source: typeof rnConfig.navigationBarBackIcon === 'string'
-                                ? { uri: rnConfig.navigationBarBackIcon }
-                                : rnConfig.navigationBarBackIcon })),
-                    react_1.default.createElement(react_native_1.View, { style: {
-                            position: 'absolute',
-                            right: 0,
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                        } }, rnConfig.navigationBarMenus.map((item, index) => {
-                        return (react_1.default.createElement(react_native_1.TouchableOpacity, { key: `navigation-bar-menus-${index}`, onPress: () => {
-                                item.click && item.click();
-                            } }, item.icon ? (react_1.default.createElement(react_native_1.Image, { style: { height: 30, width: 30, marginEnd: 16 }, source: typeof item.icon === 'string' ? { uri: item.icon } : item.icon })) : (react_1.default.createElement(react_native_1.Text, { style: { marginEnd: 16, color: item.color ? item.color : '#343434', fontSize: 16 } }, item.text))));
-                    })))),
-                rnConfig && (react_1.default.createElement(react_native_1.View, { style: {
+            return rnConfig ? (react_1.default.createElement(react_navigation_1.SafeAreaView, { style: { flex: 1, flexDirection: 'column' } },
+                react_1.default.createElement(react_native_1.StatusBar, { backgroundColor: rnConfig.statusBar.backgroundColor, barStyle: rnConfig.statusBar.barStyle }),
+                react_1.default.createElement(CustomHeader_1.default, { rnConfig: rnConfig, screenTitle: screenTitle, backPress: this.handleBackPress }),
+                react_1.default.createElement(react_native_1.View, { style: {
                         height: rnConfig.navigationBarBottomStyle.height,
                         width: rnConfig.navigationBarBottomStyle.width,
                         backgroundColor: rnConfig.navigationBarBottomStyle.backgroundColor,
-                    } })),
-                rnConfig && rnConfig.navigationBarShadow && (react_1.default.createElement(react_native_1.View, { style: {
-                        width: '100%',
-                        height: 0.5,
-                        backgroundColor: '#aaa',
-                        elevation: 2,
-                    } })),
-                react_1.default.createElement(Screen, Object.assign({}, this.props))));
+                    } }),
+                rnConfig.navigationBarShadow && (react_1.default.createElement(react_native_1.View, { style: { width: '100%', height: 0.5, backgroundColor: '#aaa', elevation: 2 } })),
+                react_1.default.createElement(Screen, Object.assign({}, this.props)))) : (react_1.default.createElement(Screen, Object.assign({}, this.props)));
+            // TODO: iOS 刘海屏状态栏背景色问题
+            // const safeAreaViewBgColor = rnConfig ? rnConfig.statusBar.backgroundColor : '#fff';
+            // if (Platform.OS === 'android') {
+            //   return (
+            //     <SafeAreaView style={{ height: '100%', width: '100%' }}>
+            //       {rnConfig && (
+            //         <StatusBar backgroundColor={rnConfig.statusBar.backgroundColor} barStyle={rnConfig.statusBar.barStyle} />
+            //       )}
+            //       {rnConfig && (
+            //         <View
+            //           style={{
+            //             display: 'flex',
+            //             flexDirection: 'row',
+            //             alignItems: 'center',
+            //             position: 'relative',
+            //             height: rnConfig.navigationBarHeight,
+            //             backgroundColor: rnConfig.navigationBarBackgroundColor,
+            //           }}>
+            //           {/* 标题 */}
+            //           <View
+            //             style={{
+            //               position: 'absolute',
+            //               width: '100%',
+            //               height: '100%',
+            //               display: 'flex',
+            //               alignItems: rnConfig.navigationBarTitlePosition === 'left' ? 'flex-start' : 'center',
+            //               justifyContent: 'center',
+            //               padding: 48,
+            //             }}>
+            //             <Text
+            //               style={{
+            //                 color: rnConfig.navigationBarTitleStyle.color,
+            //                 fontSize: rnConfig.navigationBarTitleStyle.fontSize,
+            //                 fontFamily: rnConfig.navigationBarTitleStyle.fontFamily,
+            //                 fontWeight: rnConfig.navigationBarTitleStyle.fontWeight,
+            //                 height: rnConfig.navigationBarTitleStyle.fontSize,
+            //                 includeFontPadding: false,
+            //               }}>
+            //               {screenTitle}
+            //             </Text>
+            //           </View>
+            //           {/* 返回键 */}
+            //           <TouchableOpacity onPress={this.handleBackPress}>
+            //             <Image
+            //               style={{ height: 30, width: 30, marginStart: 8 }}
+            //               source={
+            //                 typeof rnConfig.navigationBarBackIcon === 'string'
+            //                   ? { uri: rnConfig.navigationBarBackIcon }
+            //                   : rnConfig.navigationBarBackIcon
+            //               }
+            //             />
+            //           </TouchableOpacity>
+            //           {/* 菜单键 */}
+            //           <View
+            //             style={{
+            //               position: 'absolute',
+            //               right: 0,
+            //               height: '100%',
+            //               display: 'flex',
+            //               flexDirection: 'row',
+            //               alignItems: 'center',
+            //             }}>
+            //             {rnConfig.navigationBarMenus.map((item: any, index: number) => {
+            //               return (
+            //                 <TouchableOpacity
+            //                   key={`navigation-bar-menus-${index}`}
+            //                   onPress={() => {
+            //                     item.click && item.click();
+            //                   }}>
+            //                   {item.icon ? (
+            //                     <Image
+            //                       style={{ height: 30, width: 30, marginEnd: 16 }}
+            //                       source={typeof item.icon === 'string' ? { uri: item.icon } : item.icon}
+            //                     />
+            //                   ) : (
+            //                     <Text style={{ marginEnd: 16, color: item.color ? item.color : '#343434', fontSize: 16 }}>
+            //                       {item.text}
+            //                     </Text>
+            //                   )}
+            //                 </TouchableOpacity>
+            //               );
+            //             })}
+            //           </View>
+            //         </View>
+            //       )}
+            //       {rnConfig && (
+            //         <View
+            //           style={{
+            //             height: rnConfig.navigationBarBottomStyle.height,
+            //             width: rnConfig.navigationBarBottomStyle.width,
+            //             backgroundColor: rnConfig.navigationBarBottomStyle.backgroundColor,
+            //           }}
+            //         />
+            //       )}
+            //       {rnConfig && rnConfig.navigationBarShadow && (
+            //         <View
+            //           style={{
+            //             width: '100%',
+            //             height: 0.5,
+            //             backgroundColor: '#aaa',
+            //             elevation: 2,
+            //           }}
+            //         />
+            //       )}
+            //       <Screen {...this.props} />
+            //     </SafeAreaView>
+            //   );
+            // } else {
+            // return <Screen {...this.props} />;
+            // }
             // TODO: 不再支持PullDownRefresh，因为使用ScrollView可能会导致子容器高度发生变化
             // 页面配置优先级 > 全局配置
             // let isScreenEnablePullDownRefresh =
@@ -391,29 +456,18 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             return options;
         }
         const headerTintColor = navigation.getParam('_headerTintColor', undefined);
-        if (headerTintColor) {
-            options.headerTintColor = headerTintColor;
-        }
+        headerTintColor && (options.headerTintColor = headerTintColor);
         const backgroundColor = navigation.getParam('_headerBackgroundColor', undefined);
-        if (backgroundColor) {
-            options.headerStyle = {
-                backgroundColor,
-            };
-        }
+        backgroundColor && (options.headerStyle = { backgroundColor });
         const isNavigationBarLoadingShow = navigation.getParam('_isNavigationBarLoadingShow', false);
-        options.headerTitle = () => (react_1.default.createElement(react_native_1.View, { style: {
-                flexDirection: 'row',
-                alignItems: 'center',
-            } },
-            isNavigationBarLoadingShow && react_1.default.createElement(LoadingView_1.default, { tintColor: headerTintColor }),
-            react_1.default.createElement(react_native_1.Text, { style: {
-                    flexDirection: 'row',
-                    flex: 1,
-                    fontSize: 17,
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    color: headerTintColor,
-                } }, title)));
+        if (react_native_1.Platform.OS === 'android') {
+            options.headerTitle = () => (react_1.default.createElement(react_native_1.View, { style: { flexDirection: 'row', alignItems: 'center' } },
+                isNavigationBarLoadingShow && react_1.default.createElement(LoadingView_1.default, { tintColor: headerTintColor }),
+                react_1.default.createElement(react_native_1.Text, { style: { flexDirection: 'row', flex: 1, fontSize: 16, fontWeight: '600', color: headerTintColor } }, title)));
+        }
+        else {
+            options.title = title;
+        }
         return options;
     };
     return WrappedScreen;

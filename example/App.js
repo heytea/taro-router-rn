@@ -26,38 +26,38 @@ const config = {
     navigationBarTitleText: '',
     navigationBarTextStyle: 'black',
     enablePullDownRefresh: true,
-    rn: {
-      // 以下属性，Taro官方不存在，喜茶自定义
-      statusBar: {
-        backgroundColor: 'red',
-        barStyle: 'light-content',
-        translucent: false,
-      }, // 手机状态栏
-      navigationBarTitleStyle: {
-        color: '',
-        fontSize: 13,
-        fontFamily: '',
-        fontWeight: '400',
-      },
-      navigationBarBackgroundColor: '#fff',
-      navigationBarHeight: 50, // 导航栏高度
-      navigationBarShadow: false, // 导航栏是否有阴影
-      navigationBarBottomStyle: {
-        height: 2,
-        width: '100%',
-        backgroundColor: '#eee',
-      }, // 导航栏底部线样式, object | undefined
-      navigationBarTitlePosition: 'left', // 导航栏标题位置，'left', 'center', 'right'
-      navigationBarBackIcon: '', // 导航栏返回按钮图标
-      navigationBarMenus: [
-        {
-          icon: '', // 图片路径 | undefined
-          text: '', // 文字 | undefined
-          color: '', // 文字颜色
-          click: () => {}, // 点击回调
-        },
-      ], // 导航栏菜单按钮
-    },
+    // rn: {
+    //   // 以下属性，Taro官方不存在，喜茶自定义
+    //   statusBar: {
+    //     backgroundColor: 'red',
+    //     barStyle: 'light-content',
+    //     translucent: false,
+    //   }, // 手机状态栏
+    //   navigationBarTitleStyle: {
+    //     color: '',
+    //     fontSize: 13,
+    //     fontFamily: '',
+    //     fontWeight: '400',
+    //   },
+    //   navigationBarBackgroundColor: '#fff',
+    //   navigationBarHeight: 50, // 导航栏高度
+    //   navigationBarShadow: false, // 导航栏是否有阴影
+    //   navigationBarBottomStyle: {
+    //     height: 2,
+    //     width: '100%',
+    //     backgroundColor: '#eee',
+    //   }, // 导航栏底部线样式, object | undefined
+    //   navigationBarTitlePosition: 'left', // 导航栏标题位置，'left', 'center', 'right'
+    //   navigationBarBackIcon: '', // 导航栏返回按钮图标
+    //   navigationBarMenus: [
+    //     {
+    //       icon: '', // 图片路径 | undefined
+    //       text: '', // 文字 | undefined
+    //       color: '', // 文字颜色
+    //       click: () => {}, // 点击回调
+    //     },
+    //   ], // 导航栏菜单按钮
+    // },
   },
   tabBar: {
     color: '#BFBDBC',

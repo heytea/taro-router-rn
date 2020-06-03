@@ -45,35 +45,36 @@ function DetailsScreen() {
 }
 
 DetailsScreen.config = {
-  rn: {
-    statusBar: {
-      backgroundColor: 'blue',
-      barStyle: 'light-content',
-    }, // 手机状态栏
-    navigationBarTitleStyle: {
-      color: '',
-      fontSize: 13,
-      fontFamily: '',
-      fontWeight: '400',
-    },
-    navigationBarHeight: 50, // 导航栏高度
-    navigationBarShadow: false, // 导航栏是否有阴影
-    navigationBarBottomStyle: {
-      height: 2,
-      width: '100%',
-      backgroundColor: '#eee',
-    }, // 导航栏底部线样式, object | undefined
-    navigationBarTitlePosition: 'left', // 导航栏标题位置，'left', 'center', 'right'
-    navigationBarBackIcon: '', // 导航栏返回按钮图标
-    navigationBarMenus: [
-      {
-        icon: '', // 图片路径 | undefined
-        text: '', // 文字 | undefined
-        color: '', // 文字颜色
-        click: () => {}, // 点击回调
-      },
-    ], // 导航栏菜单按钮
-  },
+  // navigationStyle: 'custom',
+  // rn: {
+  //   statusBar: {
+  //     backgroundColor: 'blue',
+  //     barStyle: 'light-content',
+  //   }, // 手机状态栏
+  //   navigationBarTitleStyle: {
+  //     color: '',
+  //     fontSize: 13,
+  //     fontFamily: '',
+  //     fontWeight: '400',
+  //   },
+  //   navigationBarHeight: 50, // 导航栏高度
+  //   navigationBarShadow: false, // 导航栏是否有阴影
+  //   navigationBarBottomStyle: {
+  //     height: 2,
+  //     width: '100%',
+  //     backgroundColor: '#eee',
+  //   }, // 导航栏底部线样式, object | undefined
+  //   navigationBarTitlePosition: 'center', // 导航栏标题位置，'left', 'center', 'right'
+  //   navigationBarBackIcon: '', // 导航栏返回按钮图标
+  //   navigationBarMenus: [
+  //     {
+  //       icon: '', // 图片路径 | undefined
+  //       text: '', // 文字 | undefined
+  //       color: '', // 文字颜色
+  //       click: () => {}, // 点击回调
+  //     },
+  //   ], // 导航栏菜单按钮
+  // },
 };
 
 export default DetailsScreen;

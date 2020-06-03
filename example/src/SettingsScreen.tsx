@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Button } from 'react-native';
+import { View, Button, StatusBar } from 'react-native';
 import Taro from './taro/Taro';
 
 export default class SettingsScreen extends React.Component {

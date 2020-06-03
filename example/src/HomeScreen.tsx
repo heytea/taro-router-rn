@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Button } from 'react-native';
+import { View, Button, StatusBar } from 'react-native';
 import Taro from './taro/Taro';
 
 export interface IProps {}
@@ -7,28 +7,28 @@ export interface IProps {}
 export default class HomeScreen extends React.Component<IProps> {
   static config = {
     // navigationStyle: 'custom',
-    rn: {
-      statusBar: {
-        backgroundColor: 'white',
-      },
-      navigationBarMenus: [
-        {
-          text: '按钮1',
-          color: '#9e9e9e',
-          click: () => {
-            console.log('按钮1');
-          },
-        },
-        {
-          icon: 'http://static.heytea.com/taro_trial/v1/img/bar/home-icon-normal.png',
-          text: '按钮2',
-          color: '#9e9e9e',
-          click: () => {
-            console.log('按钮2');
-          },
-        },
-      ],
-    },
+    // rn: {
+    //   statusBar: {
+    //     backgroundColor: 'white',
+    //   },
+    //   navigationBarMenus: [
+    //     {
+    //       text: '按钮1',
+    //       color: '#9e9e9e',
+    //       click: () => {
+    //         console.log('按钮1');
+    //       },
+    //     },
+    //     {
+    //       icon: 'http://static.heytea.com/taro_trial/v1/img/bar/home-icon-normal.png',
+    //       text: '按钮2',
+    //       color: '#9e9e9e',
+    //       click: () => {
+    //         console.log('按钮2');
+    //       },
+    //     },
+    //   ],
+    // },
   };
 
   private visible: boolean;
