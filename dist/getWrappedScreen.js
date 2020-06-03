@@ -467,6 +467,8 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
         }
         else {
             options.title = title;
+            options.headerBackTitle = ' ';
+            options.headerTintColor = '#343434';
         }
         return options;
     };
