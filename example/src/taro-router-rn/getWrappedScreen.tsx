@@ -373,10 +373,10 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
           {rnConfig.navigationBarShadow && (
             <View style={{ width: '100%', height: 0.5, backgroundColor: '#aaa', elevation: 2 }} />
           )}
-          <Screen {...this.props} />
+          <Screen ref={this.screenRef} {...this.props} />
         </SafeAreaView>
       ) : (
-        <Screen {...this.props} />
+        <Screen ref={this.screenRef} {...this.props} />
       );
       // TODO: iOS 刘海屏状态栏背景色问题
       // const safeAreaViewBgColor = rnConfig ? rnConfig.statusBar.backgroundColor : '#fff';

@@ -309,7 +309,7 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
                         backgroundColor: rnConfig.navigationBarBottomStyle.backgroundColor,
                     } }),
                 rnConfig.navigationBarShadow && (react_1.default.createElement(react_native_1.View, { style: { width: '100%', height: 0.5, backgroundColor: '#aaa', elevation: 2 } })),
-                react_1.default.createElement(Screen, Object.assign({}, this.props)))) : (react_1.default.createElement(Screen, Object.assign({}, this.props)));
+                react_1.default.createElement(Screen, Object.assign({ ref: this.screenRef }, this.props)))) : (react_1.default.createElement(Screen, Object.assign({ ref: this.screenRef }, this.props)));
             // TODO: iOS 刘海屏状态栏背景色问题
             // const safeAreaViewBgColor = rnConfig ? rnConfig.statusBar.backgroundColor : '#fff';
             // if (Platform.OS === 'android') {
