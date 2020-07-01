@@ -45,6 +45,14 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             this.subsDidFocus && this.subsDidFocus.remove();
             this.subsWillBlur && this.subsWillBlur.remove();
         }
+        componentDidCatch(error, errorInfo) {
+            this.setState({
+                crash: {
+                    error,
+                    errorInfo,
+                },
+            });
+        }
         /**
          * @description 如果 Screen 被包裹过（如：@connect），
          * 需提供获取包裹前 Screen 实例的方法 getWrappedInstance 并暴露出被包裹组件的 config
@@ -299,7 +307,14 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
         render() {
             const screenNavigationOptions = initRouter_1.getNavigationOption(Screen.config);
             const rnConfig = utils_1.getRnNavigationOption(screenNavigationOptions.rn, globalNavigationOptions.rn);
-            console.log('rnConfig', rnConfig);
+            const { crash } = this.state;
+            if (crash) {
+                return (react_1.default.createElement(react_native_1.ScrollView, { style: { flex: 1, backgroundColor: 'red' } },
+                    react_1.default.createElement(react_native_1.Text, { style: { color: '#fff' } }, crash.error.name),
+                    react_1.default.createElement(react_native_1.Text, { style: { color: '#fff' } }, crash.error.message),
+                    react_1.default.createElement(react_native_1.Text, { style: { color: '#fff' } }, crash.error.stack),
+                    react_1.default.createElement(react_native_1.Text, { style: { color: '#fff' } }, crash.errorInfo.componentStack)));
+            }
             return rnConfig ? (react_1.default.createElement(react_navigation_1.SafeAreaView, { style: { flex: 1, flexDirection: 'column' } },
                 react_1.default.createElement(react_native_1.StatusBar, { backgroundColor: rnConfig.statusBar.backgroundColor, barStyle: rnConfig.statusBar.barStyle }),
                 react_1.default.createElement(CustomHeader_1.default, { rnConfig: rnConfig, screenTitle: screenTitle, backPress: this.handleBackPress }),
@@ -310,140 +325,6 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
                     } }),
                 rnConfig.navigationBarShadow && (react_1.default.createElement(react_native_1.View, { style: { width: '100%', height: 0.5, backgroundColor: '#aaa', elevation: 2 } })),
                 react_1.default.createElement(Screen, Object.assign({ ref: this.screenRef }, this.props)))) : (react_1.default.createElement(Screen, Object.assign({ ref: this.screenRef }, this.props)));
-            // TODO: iOS 刘海屏状态栏背景色问题
-            // const safeAreaViewBgColor = rnConfig ? rnConfig.statusBar.backgroundColor : '#fff';
-            // if (Platform.OS === 'android') {
-            //   return (
-            //     <SafeAreaView style={{ height: '100%', width: '100%' }}>
-            //       {rnConfig && (
-            //         <StatusBar backgroundColor={rnConfig.statusBar.backgroundColor} barStyle={rnConfig.statusBar.barStyle} />
-            //       )}
-            //       {rnConfig && (
-            //         <View
-            //           style={{
-            //             display: 'flex',
-            //             flexDirection: 'row',
-            //             alignItems: 'center',
-            //             position: 'relative',
-            //             height: rnConfig.navigationBarHeight,
-            //             backgroundColor: rnConfig.navigationBarBackgroundColor,
-            //           }}>
-            //           {/* 标题 */}
-            //           <View
-            //             style={{
-            //               position: 'absolute',
-            //               width: '100%',
-            //               height: '100%',
-            //               display: 'flex',
-            //               alignItems: rnConfig.navigationBarTitlePosition === 'left' ? 'flex-start' : 'center',
-            //               justifyContent: 'center',
-            //               padding: 48,
-            //             }}>
-            //             <Text
-            //               style={{
-            //                 color: rnConfig.navigationBarTitleStyle.color,
-            //                 fontSize: rnConfig.navigationBarTitleStyle.fontSize,
-            //                 fontFamily: rnConfig.navigationBarTitleStyle.fontFamily,
-            //                 fontWeight: rnConfig.navigationBarTitleStyle.fontWeight,
-            //                 height: rnConfig.navigationBarTitleStyle.fontSize,
-            //                 includeFontPadding: false,
-            //               }}>
-            //               {screenTitle}
-            //             </Text>
-            //           </View>
-            //           {/* 返回键 */}
-            //           <TouchableOpacity onPress={this.handleBackPress}>
-            //             <Image
-            //               style={{ height: 30, width: 30, marginStart: 8 }}
-            //               source={
-            //                 typeof rnConfig.navigationBarBackIcon === 'string'
-            //                   ? { uri: rnConfig.navigationBarBackIcon }
-            //                   : rnConfig.navigationBarBackIcon
-            //               }
-            //             />
-            //           </TouchableOpacity>
-            //           {/* 菜单键 */}
-            //           <View
-            //             style={{
-            //               position: 'absolute',
-            //               right: 0,
-            //               height: '100%',
-            //               display: 'flex',
-            //               flexDirection: 'row',
-            //               alignItems: 'center',
-            //             }}>
-            //             {rnConfig.navigationBarMenus.map((item: any, index: number) => {
-            //               return (
-            //                 <TouchableOpacity
-            //                   key={`navigation-bar-menus-${index}`}
-            //                   onPress={() => {
-            //                     item.click && item.click();
-            //                   }}>
-            //                   {item.icon ? (
-            //                     <Image
-            //                       style={{ height: 30, width: 30, marginEnd: 16 }}
-            //                       source={typeof item.icon === 'string' ? { uri: item.icon } : item.icon}
-            //                     />
-            //                   ) : (
-            //                     <Text style={{ marginEnd: 16, color: item.color ? item.color : '#343434', fontSize: 16 }}>
-            //                       {item.text}
-            //                     </Text>
-            //                   )}
-            //                 </TouchableOpacity>
-            //               );
-            //             })}
-            //           </View>
-            //         </View>
-            //       )}
-            //       {rnConfig && (
-            //         <View
-            //           style={{
-            //             height: rnConfig.navigationBarBottomStyle.height,
-            //             width: rnConfig.navigationBarBottomStyle.width,
-            //             backgroundColor: rnConfig.navigationBarBottomStyle.backgroundColor,
-            //           }}
-            //         />
-            //       )}
-            //       {rnConfig && rnConfig.navigationBarShadow && (
-            //         <View
-            //           style={{
-            //             width: '100%',
-            //             height: 0.5,
-            //             backgroundColor: '#aaa',
-            //             elevation: 2,
-            //           }}
-            //         />
-            //       )}
-            //       <Screen {...this.props} />
-            //     </SafeAreaView>
-            //   );
-            // } else {
-            // return <Screen {...this.props} />;
-            // }
-            // TODO: 不再支持PullDownRefresh，因为使用ScrollView可能会导致子容器高度发生变化
-            // 页面配置优先级 > 全局配置
-            // let isScreenEnablePullDownRefresh =
-            //   enablePullDownRefresh === undefined ? globalNavigationOptions.enablePullDownRefresh : enablePullDownRefresh;
-            // return disableScroll ? (
-            //   <SafeAreaView style={{ height: '100%', width: '100%' }}>
-            //     <Screen {...this.props} />
-            //   </SafeAreaView>
-            // ) : (
-            //   <SafeAreaView style={{ height: '100%', width: '100%' }}>
-            //     <ScrollView
-            //       style={{ flex: 1 }}
-            //       contentContainerStyle={{ minHeight: '100%' }}
-            //       alwaysBounceVertical
-            //       scrollEventThrottle={5}
-            //       refreshControl={
-            //         isScreenEnablePullDownRefresh ? (
-            //           <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handlePullRefresh} />
-            //         ) : undefined
-            //       }>
-            //       <Screen ref={this.screenRef} {...this.props} />
-            //     </ScrollView>
-            //   </SafeAreaView>
-            // );
         }
     }
     WrappedScreen.navigationOptions = ({ navigation, }) => {

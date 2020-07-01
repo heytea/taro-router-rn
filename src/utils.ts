@@ -89,8 +89,11 @@ export const HEADER_CONFIG_MAP: KV = {
   rn: 'rn', // react native 的独立属性
 };
 
-export function getNavigationOption(config: KV) {
+export function getNavigationOption(config?: KV) {
   let navigationOption: KV = {};
+  if (!config) {
+    return navigationOption;
+  }
   if (typeof config !== 'object') {
     return navigationOption;
   }

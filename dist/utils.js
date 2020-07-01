@@ -75,6 +75,9 @@ exports.HEADER_CONFIG_MAP = {
 };
 function getNavigationOption(config) {
     let navigationOption = {};
+    if (!config) {
+        return navigationOption;
+    }
     if (typeof config !== 'object') {
         return navigationOption;
     }
