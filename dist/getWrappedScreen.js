@@ -29,6 +29,7 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             this.screenRef = react_1.default.createRef();
             this.state = {
                 refreshing: false,
+                crash: undefined,
             };
         }
         UNSAFE_componentWillMount() {

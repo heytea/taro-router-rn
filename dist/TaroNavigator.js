@@ -32,6 +32,9 @@ class TaroNavigator {
         }
         return utils_1.successHandler(success, complete);
     }
+    /**
+     * 关闭当前页面，跳转到应用内的某个页面。但是不允许跳转到 tabbar 页面。
+     */
     static wxRedirectTo(option) {
         let { url, success, fail, complete } = option;
         if (!url) {
@@ -59,6 +62,9 @@ class TaroNavigator {
         }
         return utils_1.successHandler(success, complete);
     }
+    /**
+     * 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面
+     */
     static wxSwitchTab(option) {
         let { url, success, fail, complete } = option;
         if (!url) {
@@ -69,6 +75,7 @@ class TaroNavigator {
         }
         let obj = query_string_1.default.parseUrl(url);
         try {
+            NavigationService_1.default.popToTop();
             NavigationService_1.default.navigate({ routeName: obj.url, params: obj.query });
         }
         catch (error) {
@@ -85,15 +92,18 @@ class TaroNavigator {
         }
         return [];
     }
+    /**
+     * 关闭所有页面，打开到应用内的某个页面
+     */
     static wxReLaunch(option) {
         let { url, success, fail, complete } = option;
-        const pages = this.wxGetCurrentPages();
-        const length = pages.length;
+        if (!url) {
+            return Promise.reject(new Error('wxNavigateTo(option: NavigateOption) option.url is undefined'));
+        }
+        let obj = query_string_1.default.parseUrl(url);
         try {
-            if (length > 0) {
-                this.wxNavigateBack({ delta: length });
-            }
-            this.wxRedirectTo({ url });
+            NavigationService_1.default.popToTop();
+            NavigationService_1.default.replace({ routeName: obj.url, params: obj.query });
         }
         catch (error) {
             return utils_1.errorHandler(error, fail, complete);

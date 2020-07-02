@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, Button } from 'react-native';
 import Taro from './taro/Taro';
 
 function DetailsScreen() {
@@ -33,6 +33,49 @@ function DetailsScreen() {
         }}>
         Close
       </Text>
+      <Button
+        title="switchTab"
+        onPress={() => {
+          Taro.switchTab({
+            url: 'pages/code/code',
+            success: () => {
+              console.log('success');
+            },
+            fail: async (e: any) => {
+              console.log(e);
+            },
+          });
+        }}
+      />
+      <Button
+        title="reLaunch"
+        onPress={() => {
+          Taro.reLaunch({
+            url: 'pages/index/index',
+            success: () => {
+              console.log('success');
+            },
+            fail: async (e: any) => {
+              console.log(e);
+            },
+          });
+        }}
+      />
+      <Button
+        title="redirectTo"
+        onPress={() => {
+          Taro.redirectTo({
+            url: 'pages/index/index',
+            success: () => {
+              console.log('success');
+            },
+            fail: async (e: any) => {
+              console.log(e);
+            },
+          });
+        }}
+      />
+
       <Image
         source={{
           uri:
