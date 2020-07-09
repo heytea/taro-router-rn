@@ -37,7 +37,7 @@ function DetailsScreen() {
         title="switchTab"
         onPress={() => {
           Taro.switchTab({
-            url: 'pages/code/code',
+            url: 'pages/index/index',
             success: () => {
               console.log('success');
             },
@@ -51,7 +51,7 @@ function DetailsScreen() {
         title="reLaunch"
         onPress={() => {
           Taro.reLaunch({
-            url: 'pages/index/index',
+            url: 'pages/invoice/info/index',
             success: () => {
               console.log('success');
             },
@@ -65,7 +65,7 @@ function DetailsScreen() {
         title="redirectTo"
         onPress={() => {
           Taro.redirectTo({
-            url: 'pages/index/index',
+            url: 'pages/invoice/info/index',
             success: () => {
               console.log('success');
             },

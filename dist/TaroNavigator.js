@@ -45,7 +45,8 @@ class TaroNavigator {
         }
         let obj = query_string_1.default.parseUrl(url);
         try {
-            NavigationService_1.default.replace({ routeName: obj.url, params: obj.query });
+            NavigationService_1.default.goBack();
+            NavigationService_1.default.navigate({ routeName: obj.url, params: obj.query });
         }
         catch (error) {
             return utils_1.errorHandler(error, fail, complete);
@@ -100,10 +101,13 @@ class TaroNavigator {
         if (!url) {
             return Promise.reject(new Error('wxNavigateTo(option: NavigateOption) option.url is undefined'));
         }
+        if (url.startsWith('/')) {
+            url = url.substr(1);
+        }
         let obj = query_string_1.default.parseUrl(url);
         try {
             NavigationService_1.default.popToTop();
-            NavigationService_1.default.replace({ routeName: obj.url, params: obj.query });
+            NavigationService_1.default.navigate({ routeName: obj.url, params: obj.query });
         }
         catch (error) {
             return utils_1.errorHandler(error, fail, complete);

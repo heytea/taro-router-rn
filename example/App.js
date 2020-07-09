@@ -18,6 +18,7 @@ import assetsImgBarBuyPng from './src/assets/img/buy.png';
 import assetsImgBarTakeActivePng from './src/assets/img/take-active.png';
 import assetsImgBarTakePng from './src/assets/img/take.png';
 import { initRouter } from './src/taro-router-rn/initRouter';
+import InfoScreen from './src/InfoScreen';
 
 const config = {
   window: {
@@ -95,6 +96,7 @@ const RootStack = initRouter(
     ['pages/index/index', HomeScreen],
     ['pages/code/code', SettingsScreen],
     ['pages/invoice/batch_company/index', DetailsScreen],
+    ['pages/invoice/info/index', InfoScreen],
   ],
   Taro,
   config,
