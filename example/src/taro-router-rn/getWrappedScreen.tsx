@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { ErrorInfo } from 'react';
-import { YellowBox, View, Text, StatusBar, Platform, ScrollView } from 'react-native';
+import { YellowBox, View, Text, StatusBar, Platform, ScrollView, AppState, AppStateStatus } from 'react-native';
 import {
   NavigationScreenProp,
   NavigationRoute,
@@ -92,11 +92,13 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       this.subsWillBlur = this.props.navigation.addListener('willBlur', () => {
         this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
       });
+      AppState.addEventListener('change', this.handleAppStateChange);
     }
 
     componentWillUnmount() {
       this.subsDidFocus && this.subsDidFocus.remove();
       this.subsWillBlur && this.subsWillBlur.remove();
+      AppState.removeEventListener('change', this.handleAppStateChange);
     }
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -107,6 +109,20 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
         },
       });
     }
+
+    private handleAppStateChange = (state: AppStateStatus) => {
+      if (state === 'active' && this.props.navigation.state) {
+        // @ts-ignore
+        if (this.props.navigation.state.routeName === NavigationService.getCurrentRouteName()) {
+          this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
+        }
+      } else if (state === 'background' && this.props.navigation.state) {
+        // @ts-ignore
+        if (this.props.navigation.state.routeName === NavigationService.getCurrentRouteName()) {
+          this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
+        }
+      }
+    };
 
     /**
      * @description 如果 Screen 被包裹过（如：@connect），

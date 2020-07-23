@@ -14,6 +14,12 @@ export default class SettingsScreen extends React.Component {
   componentDidMount() {
     Taro.setNavigationBarTitle({ title: '设置' });
   }
+  componentDidShow() {
+    console.log('componentDidShow');
+  }
+  componentDidHide() {
+    console.log('componentDidHide');
+  }
   render() {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

@@ -18,6 +18,20 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
     class WrappedScreen extends react_1.default.Component {
         constructor(props) {
             super(props);
+            this.handleAppStateChange = (state) => {
+                if (state === 'active' && this.props.navigation.state) {
+                    // @ts-ignore
+                    if (this.props.navigation.state.routeName === NavigationService_1.default.getCurrentRouteName()) {
+                        this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
+                    }
+                }
+                else if (state === 'background' && this.props.navigation.state) {
+                    // @ts-ignore
+                    if (this.props.navigation.state.routeName === NavigationService_1.default.getCurrentRouteName()) {
+                        this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
+                    }
+                }
+            };
             this.handlePullRefresh = () => {
                 this.setState({ refreshing: true });
                 this.getScreenInstance().onPullDownRefresh && this.getScreenInstance().onPullDownRefresh();
@@ -41,10 +55,12 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             this.subsWillBlur = this.props.navigation.addListener('willBlur', () => {
                 this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
             });
+            react_native_1.AppState.addEventListener('change', this.handleAppStateChange);
         }
         componentWillUnmount() {
             this.subsDidFocus && this.subsDidFocus.remove();
             this.subsWillBlur && this.subsWillBlur.remove();
+            react_native_1.AppState.removeEventListener('change', this.handleAppStateChange);
         }
         componentDidCatch(error, errorInfo) {
             this.setState({
