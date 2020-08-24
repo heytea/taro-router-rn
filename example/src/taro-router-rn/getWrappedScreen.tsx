@@ -1,6 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { ErrorInfo } from 'react';
-import { YellowBox, View, Text, StatusBar, Platform, ScrollView, AppState, AppStateStatus } from 'react-native';
+import React, {ErrorInfo} from 'react';
+import {
+  YellowBox,
+  View,
+  Text,
+  StatusBar,
+  Platform,
+  ScrollView,
+  AppState,
+  AppStateStatus,
+} from 'react-native';
 import {
   NavigationScreenProp,
   NavigationRoute,
@@ -8,9 +17,9 @@ import {
   NavigationEventSubscription,
   SafeAreaView,
 } from 'react-navigation';
-import { errorHandler, successHandler, getRnNavigationOption } from './utils';
+import {errorHandler, successHandler, getRnNavigationOption} from './utils';
 import LoadingView from './LoadingView';
-import { getNavigationOption } from './initRouter';
+import {getNavigationOption} from './initRouter';
 import {
   _globalTabBarBadgeConfig,
   _globalTabBarRedDotConfig,
@@ -21,7 +30,11 @@ import {
 import NavigationService from './NavigationService';
 import CustomHeader from './CustomHeader';
 
-function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: Taro) {
+function getWrappedScreen(
+  Screen: any,
+  globalNavigationOptions: KV = {},
+  Taro: Taro,
+) {
   interface IProps {
     navigation: NavigationScreenProp<WrappedScreen>;
   }
@@ -39,7 +52,6 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     private subsWillBlur?: NavigationEventSubscription;
     constructor(props: IProps) {
       super(props);
-      YellowBox.ignoreWarnings(['Calling `getNode()` on the ref of an Animated']);
       this.screenRef = React.createRef<any>();
       this.state = {
         refreshing: false,
@@ -50,27 +62,51 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     static navigationOptions = ({
       navigation,
     }: {
-      navigation: NavigationScreenProp<NavigationRoute<NavigationParams>, NavigationParams>;
+      navigation: NavigationScreenProp<
+        NavigationRoute<NavigationParams>,
+        NavigationParams
+      >;
     }) => {
       const title = navigation.getParam('_tabBarTitle', '');
       screenTitle = title;
       const options: any = {};
       const navigationOptions = getNavigationOption(Screen.config);
-      if (navigationOptions.navigationStyle === 'custom' || navigationOptions.rn) {
+      if (
+        navigationOptions.navigationStyle === 'custom' ||
+        navigationOptions.rn
+      ) {
         options.header = () => <View />;
         return options;
       }
-      const headerTintColor = navigation.getParam('_headerTintColor', undefined);
+      const headerTintColor = navigation.getParam(
+        '_headerTintColor',
+        undefined,
+      );
       headerTintColor && (options.headerTintColor = headerTintColor);
-      const backgroundColor = navigation.getParam('_headerBackgroundColor', undefined);
-      backgroundColor && (options.headerStyle = { backgroundColor });
+      const backgroundColor = navigation.getParam(
+        '_headerBackgroundColor',
+        undefined,
+      );
+      backgroundColor && (options.headerStyle = {backgroundColor});
 
-      const isNavigationBarLoadingShow = navigation.getParam('_isNavigationBarLoadingShow', false);
+      const isNavigationBarLoadingShow = navigation.getParam(
+        '_isNavigationBarLoadingShow',
+        false,
+      );
       if (Platform.OS === 'android') {
         options.headerTitle = () => (
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            {isNavigationBarLoadingShow && <LoadingView tintColor={headerTintColor} />}
-            <Text style={{ flexDirection: 'row', flex: 1, fontSize: 16, fontWeight: '600', color: headerTintColor }}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            {isNavigationBarLoadingShow && (
+              <LoadingView tintColor={headerTintColor} />
+            )}
+            <Text
+              style={{
+                flexDirection: 'row',
+                flex: 1,
+                fontSize: 16,
+                fontWeight: '600',
+                color: headerTintColor,
+              }}>
               {title}
             </Text>
           </View>
@@ -87,10 +123,12 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       this.initBinding();
       this.subsDidFocus = this.props.navigation.addListener('didFocus', () => {
         this.initBinding();
-        this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
+        this.getScreenInstance().componentDidShow &&
+          this.getScreenInstance().componentDidShow();
       });
       this.subsWillBlur = this.props.navigation.addListener('willBlur', () => {
-        this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
+        this.getScreenInstance().componentDidHide &&
+          this.getScreenInstance().componentDidHide();
       });
       AppState.addEventListener('change', this.handleAppStateChange);
     }
@@ -102,24 +140,34 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     }
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-      this.setState({
-        crash: {
-          error,
-          errorInfo,
-        },
-      });
+      if (__DEV__) {
+        this.setState({
+          crash: {
+            error,
+            errorInfo,
+          },
+        });
+      }
     }
 
     private handleAppStateChange = (state: AppStateStatus) => {
       if (state === 'active' && this.props.navigation.state) {
         // @ts-ignore
-        if (this.props.navigation.state.routeName === NavigationService.getCurrentRouteName()) {
-          this.getScreenInstance().componentDidShow && this.getScreenInstance().componentDidShow();
+        if (
+          this.props.navigation.state.routeName ===
+          NavigationService.getCurrentRouteName()
+        ) {
+          this.getScreenInstance().componentDidShow &&
+            this.getScreenInstance().componentDidShow();
         }
       } else if (state === 'background' && this.props.navigation.state) {
         // @ts-ignore
-        if (this.props.navigation.state.routeName === NavigationService.getCurrentRouteName()) {
-          this.getScreenInstance().componentDidHide && this.getScreenInstance().componentDidHide();
+        if (
+          this.props.navigation.state.routeName ===
+          NavigationService.getCurrentRouteName()
+        ) {
+          this.getScreenInstance().componentDidHide &&
+            this.getScreenInstance().componentDidHide();
         }
       }
     };
@@ -166,7 +214,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     }
 
     private setNavigationBarTitle(option?: NavigatorTitleOption) {
-      const { title = '', success, fail, complete } = option || {};
+      const {title = '', success, fail, complete} = option || {};
       try {
         this.props.navigation.setParams({
           _tabBarTitle: title,
@@ -178,7 +226,8 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     }
 
     private setNavigationBarColor(option?: NavigatorBarColorOption) {
-      const { frontColor, backgroundColor, success, fail, complete } = option || {};
+      const {frontColor, backgroundColor, success, fail, complete} =
+        option || {};
       try {
         this.props.navigation.setParams({
           _headerTintColor: frontColor,
@@ -192,7 +241,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
 
     // 在 navigation bar 上显示加载圈
     private showNavigationBarLoading(option?: NavigationOption) {
-      const { success, fail, complete } = option || {};
+      const {success, fail, complete} = option || {};
       try {
         this.props.navigation.setParams({
           _isNavigationBarLoadingShow: true,
@@ -204,7 +253,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     }
 
     private hideNavigationBarLoading(option?: NavigationOption) {
-      const { success, fail, complete } = option || {};
+      const {success, fail, complete} = option || {};
       try {
         this.props.navigation.setParams({
           _isNavigationBarLoadingShow: false,
@@ -219,7 +268,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
      * 开始下拉刷新。调用后触发下拉刷新动画，效果与用户手动下拉刷新一致。
      */
     private startPullDownRefresh(option?: NavigationOption) {
-      const { success, fail, complete } = option || {};
+      const {success, fail, complete} = option || {};
       try {
         this.setState({
           refreshing: true,
@@ -234,7 +283,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
      * 停止当前页面下拉刷新
      */
     private stopPullDownRefresh(option?: NavigationOption) {
-      const { success, fail, complete } = option || {};
+      const {success, fail, complete} = option || {};
       try {
         this.setState({
           refreshing: false,
@@ -250,7 +299,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
      * @param {NavigatorBadgeOption} option index:tabBar 的哪一项，从左边算起; text: 显示的文本，超过 4 个字符则显示成 ...
      */
     private setTabBarBadge(option: NavigatorBadgeOption) {
-      const { index, text, success, fail, complete } = option;
+      const {index, text, success, fail, complete} = option;
       try {
         _globalTabBarBadgeConfig[`${index}`] = {
           _tabBarBadgeIndex: index,
@@ -269,7 +318,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
      * @param option index: tabBar 的哪一项，从左边算起
      */
     private removeTabBarBadge(option: NavigatorBadgeRemoveOption) {
-      const { index, success, fail, complete } = option;
+      const {index, success, fail, complete} = option;
       try {
         delete _globalTabBarBadgeConfig[`${index}`];
         this.props.navigation.setParams(_globalTabBarBadgeConfig);
@@ -284,7 +333,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
      * @param option index: tabBar 的哪一项，从左边算起
      */
     private showTabBarRedDot(option: NavigatorRedDotOption) {
-      const { index, success, fail, complete } = option;
+      const {index, success, fail, complete} = option;
       try {
         _globalTabBarRedDotConfig[`${index}`] = {
           _tabBarRedDotIndex: index,
@@ -302,7 +351,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
      * @param option index: tabBar 的哪一项，从左边算起
      */
     private hideTabBarRedDot(option: NavigatorRedDotOption) {
-      const { index, success, fail, complete } = option;
+      const {index, success, fail, complete} = option;
       try {
         delete _globalTabBarRedDotConfig[`${index}`];
         this.props.navigation.setParams(_globalTabBarRedDotConfig);
@@ -316,7 +365,15 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
      * 动态设置 tabBar 的整体样式
      */
     private setTabBarStyle(option?: NavigatorStyleOption) {
-      const { color, selectedColor, backgroundColor, borderStyle, success, fail, complete } = option || {};
+      const {
+        color,
+        selectedColor,
+        backgroundColor,
+        borderStyle,
+        success,
+        fail,
+        complete,
+      } = option || {};
       try {
         _globalTabBarStyleConfig._tabColor = color;
         _globalTabBarStyleConfig._tabSelectedColor = selectedColor;
@@ -334,7 +391,15 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
      * @param option
      */
     private setTabBarItem(option: NavigatorItemOption) {
-      const { index, text, iconPath, selectedIconPath, success, fail, complete } = option;
+      const {
+        index,
+        text,
+        iconPath,
+        selectedIconPath,
+        success,
+        fail,
+        complete,
+      } = option;
       try {
         _globalTabBarItemConfig[`${index}`] = {
           _tabBarItemIndex: index,
@@ -351,7 +416,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     }
 
     private showTabBar(option?: NavigatorTabBarOption) {
-      const { animation = false, success, fail, complete } = option || {};
+      const {animation = false, success, fail, complete} = option || {};
       try {
         this.props.navigation.setParams({
           _tabBarVisible: true,
@@ -364,7 +429,7 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     }
 
     private hideTabBar(option?: NavigatorTabBarOption) {
-      const { animation = false, success, fail, complete } = option || {};
+      const {animation = false, success, fail, complete} = option || {};
       try {
         this.props.navigation.setParams({
           _tabBarVisible: false,
@@ -377,8 +442,9 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
     }
 
     private handlePullRefresh = () => {
-      this.setState({ refreshing: true });
-      this.getScreenInstance().onPullDownRefresh && this.getScreenInstance().onPullDownRefresh();
+      this.setState({refreshing: true});
+      this.getScreenInstance().onPullDownRefresh &&
+        this.getScreenInstance().onPullDownRefresh();
     };
 
     private handleBackPress = () => {
@@ -387,32 +453,51 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
 
     render() {
       const screenNavigationOptions = getNavigationOption(Screen.config);
-      const rnConfig = getRnNavigationOption(screenNavigationOptions.rn, globalNavigationOptions.rn);
-      const { crash } = this.state;
+      const rnConfig = getRnNavigationOption(
+        screenNavigationOptions.rn,
+        globalNavigationOptions.rn,
+      );
+      const {crash} = this.state;
       if (crash) {
         return (
-          <ScrollView style={{ flex: 1, backgroundColor: 'red' }}>
-            <Text style={{ color: '#fff' }}>{crash.error.name}</Text>
-            <Text style={{ color: '#fff' }}>{crash.error.message}</Text>
-            <Text style={{ color: '#fff' }}>{crash.error.stack}</Text>
-
-            <Text style={{ color: '#fff' }}>{crash.errorInfo.componentStack}</Text>
+          <ScrollView style={{flex: 1, backgroundColor: 'red', padding: 8}}>
+            <Text style={{color: '#fff'}}>{crash.error.name}</Text>
+            <Text style={{color: '#fff'}}>{crash.error.message}</Text>
+            <Text style={{color: '#fff'}}>{crash.error.stack}</Text>
+            <Text style={{color: '#fff'}}>
+              {crash.errorInfo.componentStack}
+            </Text>
           </ScrollView>
         );
       }
       return rnConfig ? (
-        <SafeAreaView style={{ flex: 1, flexDirection: 'column' }}>
-          <StatusBar backgroundColor={rnConfig.statusBar.backgroundColor} barStyle={rnConfig.statusBar.barStyle} />
-          <CustomHeader rnConfig={rnConfig} screenTitle={screenTitle} backPress={this.handleBackPress} />
+        <SafeAreaView style={{flex: 1, flexDirection: 'column'}}>
+          <StatusBar
+            backgroundColor={rnConfig.statusBar.backgroundColor}
+            barStyle={rnConfig.statusBar.barStyle}
+          />
+          <CustomHeader
+            rnConfig={rnConfig}
+            screenTitle={screenTitle}
+            backPress={this.handleBackPress}
+          />
           <View
             style={{
               height: rnConfig.navigationBarBottomStyle.height,
               width: rnConfig.navigationBarBottomStyle.width,
-              backgroundColor: rnConfig.navigationBarBottomStyle.backgroundColor,
+              backgroundColor:
+                rnConfig.navigationBarBottomStyle.backgroundColor,
             }}
           />
           {rnConfig.navigationBarShadow && (
-            <View style={{ width: '100%', height: 0.5, backgroundColor: '#aaa', elevation: 2 }} />
+            <View
+              style={{
+                width: '100%',
+                height: 0.5,
+                backgroundColor: '#aaa',
+                elevation: 2,
+              }}
+            />
           )}
           <Screen ref={this.screenRef} {...this.props} />
         </SafeAreaView>

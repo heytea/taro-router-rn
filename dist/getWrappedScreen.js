@@ -18,6 +18,16 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
     class WrappedScreen extends react_1.default.Component {
         constructor(props) {
             super(props);
+            // componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+            //   if (__DEV__) {
+            //     this.setState({
+            //       crash: {
+            //         error,
+            //         errorInfo,
+            //       },
+            //     });
+            //   }
+            // }
             this.handleAppStateChange = (state) => {
                 if (state === 'active' && this.props.navigation.state) {
                     // @ts-ignore
@@ -61,14 +71,6 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             this.subsDidFocus && this.subsDidFocus.remove();
             this.subsWillBlur && this.subsWillBlur.remove();
             react_native_1.AppState.removeEventListener('change', this.handleAppStateChange);
-        }
-        componentDidCatch(error, errorInfo) {
-            this.setState({
-                crash: {
-                    error,
-                    errorInfo,
-                },
-            });
         }
         /**
          * @description 如果 Screen 被包裹过（如：@connect），
@@ -326,7 +328,7 @@ function getWrappedScreen(Screen, globalNavigationOptions = {}, Taro) {
             const rnConfig = utils_1.getRnNavigationOption(screenNavigationOptions.rn, globalNavigationOptions.rn);
             const { crash } = this.state;
             if (crash) {
-                return (react_1.default.createElement(react_native_1.ScrollView, { style: { flex: 1, backgroundColor: 'red' } },
+                return (react_1.default.createElement(react_native_1.ScrollView, { style: { flex: 1, backgroundColor: 'red', padding: 8 } },
                     react_1.default.createElement(react_native_1.Text, { style: { color: '#fff' } }, crash.error.name),
                     react_1.default.createElement(react_native_1.Text, { style: { color: '#fff' } }, crash.error.message),
                     react_1.default.createElement(react_native_1.Text, { style: { color: '#fff' } }, crash.error.stack),

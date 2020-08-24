@@ -101,14 +101,16 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       AppState.removeEventListener('change', this.handleAppStateChange);
     }
 
-    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-      this.setState({
-        crash: {
-          error,
-          errorInfo,
-        },
-      });
-    }
+    // componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    //   if (__DEV__) {
+    //     this.setState({
+    //       crash: {
+    //         error,
+    //         errorInfo,
+    //       },
+    //     });
+    //   }
+    // }
 
     private handleAppStateChange = (state: AppStateStatus) => {
       if (state === 'active' && this.props.navigation.state) {
@@ -391,11 +393,10 @@ function getWrappedScreen(Screen: any, globalNavigationOptions: KV = {}, Taro: T
       const { crash } = this.state;
       if (crash) {
         return (
-          <ScrollView style={{ flex: 1, backgroundColor: 'red' }}>
+          <ScrollView style={{ flex: 1, backgroundColor: 'red', padding: 8 }}>
             <Text style={{ color: '#fff' }}>{crash.error.name}</Text>
             <Text style={{ color: '#fff' }}>{crash.error.message}</Text>
             <Text style={{ color: '#fff' }}>{crash.error.stack}</Text>
-
             <Text style={{ color: '#fff' }}>{crash.errorInfo.componentStack}</Text>
           </ScrollView>
         );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Button, StatusBar } from 'react-native';
+import {View, Button, StatusBar} from 'react-native';
 import Taro from './taro/Taro';
 
 export interface IProps {}
@@ -36,13 +36,13 @@ export default class HomeScreen extends React.Component<IProps> {
     super(props);
     this.visible = true;
   }
-  static navigationOptions = ({ navigation }: { navigation: any }) => {
+  static navigationOptions = ({navigation}: {navigation: any}) => {
     return {
       title: navigation.getParam('showBar', false),
     };
   };
   componentDidMount() {
-    Taro.setNavigationBarTitle({ title: '自定义标题' });
+    Taro.setNavigationBarTitle({title: '自定义标题'});
   }
   componentDidShow() {
     console.log('componentDidShow');
@@ -58,7 +58,7 @@ export default class HomeScreen extends React.Component<IProps> {
   }
   render() {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         {/* other code from before here */}
         <Button
           title="Go to Details"
@@ -97,8 +97,14 @@ export default class HomeScreen extends React.Component<IProps> {
           onPress={() => {
             // Taro.hideTabBar();
             // Taro.stopPullDownRefresh();
-            Taro.removeTabBarBadge({ index: 1 });
+            Taro.removeTabBarBadge({index: 1});
             // Taro.hideTabBarRedDot({ index: 0 });
+          }}
+        />
+        <Button
+          title="Error"
+          onPress={() => {
+            this.a();
           }}
         />
       </View>

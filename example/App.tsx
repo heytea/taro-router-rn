@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React from 'react';
 import Taro from './src/taro/Taro';
 
@@ -17,7 +9,7 @@ import assetsImgBarBuyActivePng from './src/assets/img/buy-active.png';
 import assetsImgBarBuyPng from './src/assets/img/buy.png';
 import assetsImgBarTakeActivePng from './src/assets/img/take-active.png';
 import assetsImgBarTakePng from './src/assets/img/take.png';
-import { initRouter } from './src/taro-router-rn/initRouter';
+import {initRouter} from './src/taro-router-rn/initRouter';
 import InfoScreen from './src/InfoScreen';
 
 const config = {
