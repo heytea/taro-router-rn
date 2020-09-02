@@ -91,6 +91,40 @@ function getStackNavigator(pageList, navigationOptions, Taro) {
     const routerConfig = getStackRouterConfig(pageList, navigationOptions, Taro);
     return react_navigation_stack_1.createStackNavigator(routerConfig, {
         headerMode: navigationOptions.navigationStyle === 'custom' || navigationOptions.rn ? 'none' : 'screen',
+        defaultNavigationOptions: {
+            headerStyle: {
+                borderBottomColor: '#fff',
+                borderBottomWidth: 0,
+                backgroundColor: '#fff',
+                elevation: 0,
+            },
+            gestureDirection: 'horizontal',
+            cardStyleInterpolator: react_navigation_stack_1.CardStyleInterpolators.forHorizontalIOS,
+            transitionSpec: {
+                open: {
+                    animation: 'spring',
+                    config: {
+                        stiffness: 1000,
+                        damping: 500,
+                        mass: 3,
+                        overshootClamping: true,
+                        restDisplacementThreshold: 0.01,
+                        restSpeedThreshold: 0.01,
+                    },
+                },
+                close: {
+                    animation: 'spring',
+                    config: {
+                        stiffness: 1000,
+                        damping: 500,
+                        mass: 3,
+                        overshootClamping: true,
+                        restDisplacementThreshold: 0.01,
+                        restSpeedThreshold: 0.01,
+                    },
+                },
+            },
+        },
     });
 }
 function createRouter(pageList, appConfig, Taro) {

@@ -1,7 +1,7 @@
 import React from 'react';
 import HomeIconWithBadge from './HomeIconWithBadge';
 import { createAppContainer, NavigationState, NavigationRoute, NavigationParams } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import { createStackNavigator, CardStyleInterpolators } from 'react-navigation-stack';
 import { createBottomTabNavigator, NavigationTabProp, BottomTabBar } from 'react-navigation-tabs';
 import NavigationService from './NavigationService';
 import TaroNavigator from './TaroNavigator';
@@ -110,6 +110,40 @@ function getStackNavigator(pageList: PageList, navigationOptions: KV, Taro: Taro
   const routerConfig = getStackRouterConfig(pageList, navigationOptions, Taro);
   return createStackNavigator(routerConfig, {
     headerMode: navigationOptions.navigationStyle === 'custom' || navigationOptions.rn ? 'none' : 'screen',
+    defaultNavigationOptions: {
+      headerStyle: {
+        borderBottomColor: '#fff',
+        borderBottomWidth: 0,
+        backgroundColor: '#fff',
+        elevation: 0,
+      },
+      gestureDirection: 'horizontal',
+      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      transitionSpec: {
+        open: {
+          animation: 'spring',
+          config: {
+            stiffness: 1000,
+            damping: 500,
+            mass: 3,
+            overshootClamping: true,
+            restDisplacementThreshold: 0.01,
+            restSpeedThreshold: 0.01,
+          },
+        },
+        close: {
+          animation: 'spring',
+          config: {
+            stiffness: 1000,
+            damping: 500,
+            mass: 3,
+            overshootClamping: true,
+            restDisplacementThreshold: 0.01,
+            restSpeedThreshold: 0.01,
+          },
+        },
+      },
+    },
   });
 }
 
