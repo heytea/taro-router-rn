@@ -1,6 +1,6 @@
 {
   "name": "@heytea/taro-router-rn",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "description": "taro-router-rn",
   "main": "./index.js",
   "files": [
