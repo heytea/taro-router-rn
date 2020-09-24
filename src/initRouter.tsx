@@ -1,4 +1,5 @@
 import React from 'react';
+import { Image } from 'react-native';
 import HomeIconWithBadge from './HomeIconWithBadge';
 import { createAppContainer, NavigationState, NavigationRoute, NavigationParams } from 'react-navigation';
 import { createStackNavigator, CardStyleInterpolators } from 'react-navigation-stack';
@@ -112,11 +113,14 @@ function getStackNavigator(pageList: PageList, navigationOptions: KV, Taro: Taro
     headerMode: navigationOptions.navigationStyle === 'custom' || navigationOptions.rn ? 'none' : 'screen',
     defaultNavigationOptions: {
       headerStyle: {
-        borderBottomColor: '#fff',
-        borderBottomWidth: 0,
         backgroundColor: '#fff',
+        shadowColor: 'transparent',
+        shadowOpacity: 0,
+        borderBottomWidth: 0,
+        borderBottomColor: 'transparent',
         elevation: 0,
       },
+      headerBackImage: <Image style={{ width: 12, height: 24, marginLeft: 16 }} source={require('./img/back.png')} />,
       gestureDirection: 'horizontal',
       cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
       transitionSpec: {
