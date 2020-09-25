@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const react_native_1 = require("react-native");
 const HomeIconWithBadge_1 = __importDefault(require("./HomeIconWithBadge"));
 const react_navigation_1 = require("react-navigation");
 const react_navigation_stack_1 = require("react-navigation-stack");
@@ -101,7 +100,9 @@ function getStackNavigator(pageList, navigationOptions, Taro) {
                 borderBottomColor: 'transparent',
                 elevation: 0,
             },
-            headerBackImage: react_1.default.createElement(react_native_1.Image, { style: { width: 12, height: 24, marginLeft: 16 }, source: require('./img/back.png') }),
+            // headerBackImage: () => (
+            //   <Image style={{ width: 12, height: 24, marginLeft: 16 }} source={require('./img/back.png')} />
+            // ),
             gestureDirection: 'horizontal',
             cardStyleInterpolator: react_navigation_stack_1.CardStyleInterpolators.forHorizontalIOS,
             transitionSpec: {

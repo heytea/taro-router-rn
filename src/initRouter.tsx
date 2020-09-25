@@ -120,7 +120,9 @@ function getStackNavigator(pageList: PageList, navigationOptions: KV, Taro: Taro
         borderBottomColor: 'transparent',
         elevation: 0,
       },
-      headerBackImage: <Image style={{ width: 12, height: 24, marginLeft: 16 }} source={require('./img/back.png')} />,
+      // headerBackImage: () => (
+      //   <Image style={{ width: 12, height: 24, marginLeft: 16 }} source={require('./img/back.png')} />
+      // ),
       gestureDirection: 'horizontal',
       cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
       transitionSpec: {
