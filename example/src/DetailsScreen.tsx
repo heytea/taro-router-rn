@@ -75,6 +75,12 @@ function DetailsScreen() {
           });
         }}
       />
+      <Button
+        title="show tabbar"
+        onPress={() => {
+          Taro.showTabBar()
+        }}
+      />
 
       <Image
         source={{

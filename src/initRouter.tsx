@@ -1,5 +1,4 @@
 import React from 'react';
-import { Image } from 'react-native';
 import HomeIconWithBadge from './HomeIconWithBadge';
 import { createAppContainer, NavigationState, NavigationRoute, NavigationParams } from 'react-navigation';
 import { createStackNavigator, CardStyleInterpolators } from 'react-navigation-stack';
@@ -44,11 +43,14 @@ function getStackRouterConfig(pageList: PageList, navigationOptions: KV, Taro: T
 }
 
 // 底部导航栏是否显示
-function getTabBarVisible(navigation: NavigationTabProp<NavigationRoute<NavigationParams>, any>) {
+function getTabBarVisible(navigation: NavigationTabProp<NavigationRoute<NavigationParams>, any>, tabBar: TabBar) {
   const currentRoute = navigation.state.routes[navigation.state.index];
   const tabBarVisible = currentRoute.params ? currentRoute.params._tabBarVisible : undefined;
   if (typeof tabBarVisible === 'boolean') {
-    return tabBarVisible;
+    // 只有tab页面才能控制tabbar显示隐藏
+    if (tabBar.list.some(value => value.pagePath === currentRoute.routeName)) {
+      return tabBarVisible;
+    }
   }
   return navigation.state.index === 0;
 }
@@ -78,7 +80,7 @@ function getBottomTabNavigator(pageList: PageList, tabBar: TabBar, navigationOpt
           />
         );
       },
-      tabBarVisible: getTabBarVisible(navigation),
+      tabBarVisible: getTabBarVisible(navigation, tabBar),
     }),
     tabBarOptions: {
       showLabel: false,

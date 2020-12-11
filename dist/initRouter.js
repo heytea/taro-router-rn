@@ -45,11 +45,14 @@ function getStackRouterConfig(pageList, navigationOptions, Taro) {
     return routerConfig;
 }
 // 底部导航栏是否显示
-function getTabBarVisible(navigation) {
+function getTabBarVisible(navigation, tabBar) {
     const currentRoute = navigation.state.routes[navigation.state.index];
     const tabBarVisible = currentRoute.params ? currentRoute.params._tabBarVisible : undefined;
     if (typeof tabBarVisible === 'boolean') {
-        return tabBarVisible;
+        // 只有tab页面才能控制tabbar显示隐藏
+        if (tabBar.list.some(value => value.pagePath === currentRoute.routeName)) {
+            return tabBarVisible;
+        }
     }
     return navigation.state.index === 0;
 }
@@ -65,7 +68,7 @@ function getBottomTabNavigator(pageList, tabBar, navigationOptions, Taro) {
                         ? config_1._globalTabBarStyleConfig._tabSelectedColor
                         : tabBar.selectedColor }));
             },
-            tabBarVisible: getTabBarVisible(navigation),
+            tabBarVisible: getTabBarVisible(navigation, tabBar),
         }),
         tabBarOptions: {
             showLabel: false,
